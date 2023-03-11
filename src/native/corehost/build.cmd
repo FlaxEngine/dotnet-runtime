@@ -10,6 +10,7 @@ if %__sourceDir:~-1%==\ set "__ProjectDir=%__sourceDir:~0,-1%"
 set __engNativeDir=%__sourceDir%\..\..\..\eng\native
 set __CMakeBinDir=""
 set __IntermediatesDir=""
+set __TargetOS=windows
 set __BuildArch=x64
 set CMAKE_BUILD_TYPE=Debug
 set __PortableBuild=0
@@ -28,6 +29,8 @@ if /i [%1] == [arm]         ( set __BuildArch=arm&&shift&goto Arg_Loop)
 if /i [%1] == [x64]         ( set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [amd64]       ( set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [arm64]       ( set __BuildArch=arm64&&shift&goto Arg_Loop)
+
+if /i [%1] == [os]          ( set __TargetOS=%2&&shift&&shift&goto Arg_Loop)
 
 if /i [%1] == [portable]    ( set __PortableBuild=1&&shift&goto Arg_Loop)
 if /i [%1] == [rid]         ( set __TargetRid=%2&&shift&&shift&goto Arg_Loop)
@@ -93,7 +96,11 @@ if /i "%__BuildArch%" == "arm64"   (set cm_BaseRid=win10)
 :: Form the base RID to be used if we are doing a portable build
 if /i "%__PortableBuild%" == "1"   (set cm_BaseRid=win)
 set cm_BaseRid=%cm_BaseRid%-%__BuildArch%
-echo "Computed RID for native build is %cm_BaseRid%"
+
+if /i "%__TargetOS%" == "PS4" (set cm_BaseRid=ps4-x64)
+if /i "%__TargetOS%" == "PS4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS4")
+
+echo Computed RID for native build is %cm_BaseRid% (os=%__TargetOS%, arch=%__BuildArch%)
 
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCLI_CMAKE_HOST_VER=%__HostVersion%" "-DCLI_CMAKE_COMMON_HOST_VER=%__AppHostVersion%" "-DCLI_CMAKE_HOST_FXR_VER=%__HostFxrVersion%"
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCLI_CMAKE_HOST_POLICY_VER=%__HostPolicyVersion%" "-DCLI_CMAKE_PKG_RID=%cm_BaseRid%" "-DCLI_CMAKE_COMMIT_HASH=%__CommitSha%"
@@ -101,8 +108,7 @@ set __ExtraCmakeParams=%__ExtraCmakeParams% "-DRUNTIME_FLAVOR=%__RuntimeFlavor% 
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCLI_CMAKE_RESOURCE_DIR=%__ResourcesDir%" "-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
 
 :: Regenerate the native build files
-echo Calling "%__engNativeDir%\gen-buildsys.cmd "%__sourceDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams%"
-
+echo [corehost/build.cmd] %__engNativeDir%\gen-buildsys.cmd "%__sourceDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams%
 call "%__engNativeDir%\gen-buildsys.cmd" "%__sourceDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams%
 if NOT [%errorlevel%] == [0] goto :Failure
 popd
@@ -123,6 +129,7 @@ if [%__Ninja%] == [1] (
     set __generatorArgs=/p:Platform=%__BuildArch% /p:PlatformToolset="%__PlatformToolset%" -noWarn:MSB8065
 )
 
+echo [corehost/build.cmd] %CMakePath% --build %__IntermediatesDir% --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 call "%CMakePath%" --build "%__IntermediatesDir%" --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 IF ERRORLEVEL 1 (
     goto :Failure

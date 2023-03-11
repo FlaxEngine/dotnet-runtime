@@ -15,7 +15,9 @@
 #include <unistd.h>
 #endif
 
-#if defined(_POSIX_VERSION) && !defined (HOST_WASM)
+#if defined(__ORBIS__)
+#include "mono-dl-orbis.c"
+#elif defined(_POSIX_VERSION) && !defined (HOST_WASM)
 
 #include "mono/utils/mono-dl.h"
 #include "mono/utils/mono-embed.h"

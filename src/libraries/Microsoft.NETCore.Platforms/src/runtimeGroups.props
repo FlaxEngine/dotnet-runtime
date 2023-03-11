@@ -188,6 +188,12 @@
       <Versions>11</Versions>
     </RuntimeGroup>
 
+    <RuntimeGroup Include="ps4">
+      <Parent>unix</Parent>
+      <Architectures>x64</Architectures>
+      <Versions>1</Versions>
+    </RuntimeGroup>
+
     <RuntimeGroup Include="illumos">
       <Parent>unix</Parent>
       <Architectures>x64</Architectures>

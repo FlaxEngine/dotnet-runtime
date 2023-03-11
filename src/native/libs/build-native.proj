@@ -47,10 +47,12 @@
           BeforeTargets="Build"
           Condition="$([MSBuild]::IsOsPlatform(Windows))">
     <PropertyGroup>
+        <_BuildNativeArgs>$(_BuildNativeArgs) os $(_BuildNativeTargetOS)</_BuildNativeArgs>
         <_BuildNativeArgs Condition="'$(Ninja)' == 'false'">$(_BuildNativeArgs) msbuild</_BuildNativeArgs>
+        <_CMakeArgs Condition="'$(CMakeArgs)' != ''"> cmakeargs &quot;$(CMakeArgs)&quot;</_CMakeArgs>
     </PropertyGroup>
     <!-- Run script that uses CMake to generate and build the native files. -->
-    <Message Text="&quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)" Importance="High"/>
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)" />
+    <Message Text="[build-native.proj] &quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)$(_CMakeArgs)" Importance="High"/>
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)$(_CMakeArgs)" />
   </Target>
 </Project>

@@ -89,6 +89,8 @@ initNonPortableDistroRid()
         __uname_version=$(uname -v)
         __solaris_major_version=$(echo "${__uname_version%.*}")
         nonPortableBuildID=solaris."$__solaris_major_version"-"$buildArch"
+    elif [ "$targetOs" = "PS4" ]; then
+        nonPortableBuildID=ps4-"$buildArch"
     fi
 
     if [ -n "${nonPortableBuildID}" ]; then
@@ -192,6 +194,8 @@ initDistroRidGlobal()
                 distroRid="illumos-$buildArch"
             elif [ "$targetOs" = "Solaris" ]; then
                 distroRid="solaris-$buildArch"
+            elif [ "$targetOs" = "PS4" ]; then
+                distroRid="ps4-$buildArch"
             fi
         fi
 

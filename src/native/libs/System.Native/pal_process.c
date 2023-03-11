@@ -6,6 +6,103 @@
 #include "pal_io.h"
 #include "pal_utilities.h"
 
+#include <minipal/getexepath.h>
+
+#if TARGET_PS4
+
+/* Not supported */
+
+int32_t SystemNative_ForkAndExecProcess(const char* filename,
+                                      char* const argv[],
+                                      char* const envp[],
+                                      const char* cwd,
+                                      int32_t redirectStdin,
+                                      int32_t redirectStdout,
+                                      int32_t redirectStderr,
+                                      int32_t setCredentials,
+                                      uint32_t userId,
+                                      uint32_t groupId,
+                                      uint32_t* groups,
+                                      int32_t groupsLength,
+                                      int32_t* childPid,
+                                      int32_t* stdinFd,
+                                      int32_t* stdoutFd,
+                                      int32_t* stderrFd)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetRLimit(RLimitResources resourceType, RLimit* limits)
+{
+    return -1;
+}
+
+int32_t SystemNative_SetRLimit(RLimitResources resourceType, const RLimit* limits)
+{
+    return -1;
+}
+
+int32_t SystemNative_Kill(int32_t pid, int32_t signal)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetPid()
+{
+    return -1;
+}
+
+int32_t SystemNative_GetSid(int32_t pid)
+{
+    return -1;
+}
+
+void SystemNative_SysLog(SysLogPriority priority, const char* message, const char* arg1)
+{
+}
+
+int32_t SystemNative_WaitIdAnyExitedNoHangNoWait()
+{
+    return -1;
+}
+
+int32_t SystemNative_WaitPidExitedNoHang(int32_t pid, int32_t* exitCode)
+{
+    return -1;
+}
+
+int64_t SystemNative_PathConf(const char* path, PathConfName name)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetPriority(PriorityWhich which, int32_t who)
+{
+    return -1;
+}
+
+int32_t SystemNative_SetPriority(PriorityWhich which, int32_t who, int32_t nice)
+{
+    return -1;
+}
+
+char* SystemNative_GetCwd(char* buffer, int32_t bufferSize)
+{
+    return NULL;
+}
+
+int32_t SystemNative_SchedSetAffinity(int32_t pid, intptr_t* mask)
+{
+    return -1;
+}
+
+int32_t SystemNative_SchedGetAffinity(int32_t pid, intptr_t* mask)
+{
+    return -1;
+}
+
+#else
+
 #include <assert.h>
 #include <errno.h>
 #include <grp.h>
@@ -38,8 +135,6 @@
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #endif
-
-#include <minipal/getexepath.h>
 
 // Validate that our SysLogPriority values are correct for the platform
 c_static_assert(PAL_LOG_EMERG == LOG_EMERG);
@@ -882,6 +977,8 @@ int32_t SystemNative_SchedGetAffinity(int32_t pid, intptr_t* mask)
     errno = ENOTSUP;
     return -1;
 }
+#endif
+
 #endif
 
 char* SystemNative_GetProcessPath()

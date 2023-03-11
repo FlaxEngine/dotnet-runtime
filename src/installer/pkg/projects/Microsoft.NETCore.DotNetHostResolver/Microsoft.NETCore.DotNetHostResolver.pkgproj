@@ -11,7 +11,7 @@
     <Dependency Include="Microsoft.NETCore.DotNetAppHost" VersionProp="AppHostVersion" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(PackageTargetRuntime)' != ''">
+  <ItemGroup Condition="'$(PackageTargetRuntime)' != '' AND '$(TargetOS)' != 'PS4'">
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)hostfxr$(LibSuffix)"/>
     <File Include="@(NativeBinary)">
       <TargetPath>runtimes/$(PackageTargetRuntime)/native</TargetPath>

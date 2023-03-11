@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "../utils/mono-errno.h"
+#if defined(__ORBIS__)
+#include "gdir-orbis.c"
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -146,3 +149,4 @@ g_mkdir_with_parents (const gchar *pathname, int mode)
 
 	return 0;
 }
+#endif

@@ -14,7 +14,9 @@
 #include <unistd.h>
 #endif
 
-#if defined(_POSIX_VERSION) && !defined(HOST_WASI)
+#if defined(__ORBIS__)
+#include "mono-log-orbis.c"
+#elif defined(_POSIX_VERSION) && !defined(HOST_WASI)
 
 #include <stdlib.h>
 #include <stdio.h>

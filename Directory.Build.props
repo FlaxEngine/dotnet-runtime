@@ -171,6 +171,11 @@
     <_packageOS Condition="'$(CrossBuild)' == 'true'">$(_hostOS.ToLowerInvariant)$(_packageLibc)</_packageOS>
     <_packageOS Condition="'$(_packageOS)' == '' and '$(PortableBuild)' == 'true'">$(_portableOS)</_packageOS>
     <_packageOS Condition="'$(_packageOS)' == ''">$(_runtimeOS)</_packageOS>
+
+    <!-- Consoles use own RID -->
+    <_portableOS Condition="'$(TargetOS)' == 'PS4'">ps4</_portableOS>
+    <_runtimeOS Condition="'$(TargetOS)' == 'PS4'">ps4</_runtimeOS>
+    <_packageOS Condition="'$(TargetOS)' == 'PS4'">ps4</_packageOS>
   </PropertyGroup>
 
   <PropertyGroup Label="CalculateRID">
@@ -206,6 +211,7 @@
     <TargetsFreeBSD Condition="'$(TargetOS)' == 'FreeBSD'">true</TargetsFreeBSD>
     <Targetsillumos Condition="'$(TargetOS)' == 'illumos'">true</Targetsillumos>
     <TargetsSolaris Condition="'$(TargetOS)' == 'Solaris'">true</TargetsSolaris>
+    <TargetsPS4 Condition="'$(TargetOS)' == 'PS4'">true</TargetsPS4>
     <TargetsLinux Condition="'$(TargetOS)' == 'Linux' or '$(TargetOS)' == 'Android'">true</TargetsLinux>
     <TargetsNetBSD Condition="'$(TargetOS)' == 'NetBSD'">true</TargetsNetBSD>
     <TargetsOSX Condition="'$(TargetOS)' == 'OSX'">true</TargetsOSX>
@@ -217,7 +223,7 @@
     <TargetsAndroid Condition="'$(TargetOS)' == 'Android'">true</TargetsAndroid>
     <TargetsBrowser Condition="'$(TargetOS)' == 'Browser'">true</TargetsBrowser>
     <TargetsWindows Condition="'$(TargetOS)' == 'windows'">true</TargetsWindows>
-    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
+    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsPS4)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
   </PropertyGroup>
 
   <PropertyGroup>

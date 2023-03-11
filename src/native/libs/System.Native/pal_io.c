@@ -9,6 +9,10 @@
 #include "pal_safecrt.h"
 #include "pal_types.h"
 
+#if TARGET_PS4
+#include <pal_io_orbis.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>

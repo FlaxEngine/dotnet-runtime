@@ -8,6 +8,7 @@ set __repoRoot=%~dp0..\..\..
 set __engNativeDir=%__repoRoot%\eng\native
 set __artifactsDir=%__repoRoot%\artifacts
 set __CMakeBinDir=""
+set __CMakeArgs=""
 set __IntermediatesDir=""
 set __BuildArch=x64
 set __BuildTarget="build"
@@ -30,8 +31,11 @@ if /i [%1] == [amd64]       ( set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [arm64]       ( set __BuildArch=arm64&&shift&goto Arg_Loop)
 if /i [%1] == [wasm]        ( set __BuildArch=wasm&&shift&goto Arg_Loop)
 
+if /i [%1] == [cmakeargs]   ( set __CMakeArgs=%2&&shift&&shift&goto Arg_Loop)
+
 if /i [%1] == [outconfig] ( set __outConfig=%2&&shift&&shift&goto Arg_Loop)
 
+if /i [%1] == [os]      ( set __TargetOS=%2&&shift&&shift&goto Arg_Loop)
 if /i [%1] == [Browser] ( set __TargetOS=Browser&&shift&goto Arg_Loop)
 
 if /i [%1] == [rebuild] ( set __BuildTarget=rebuild&&shift&goto Arg_Loop)
@@ -46,8 +50,7 @@ call "%__engNativeDir%\init-vs-env.cmd" %__BuildArch%
 if NOT [%errorlevel%] == [0] goto :Failure
 
 :: Setup to cmake the native components
-echo Commencing build of native components
-echo.
+echo Commencing build of native components (os=%__TargetOS%, arch=%__BuildArch%)
 
 call "%__engNativeDir%\version\copy_version_files.cmd"
 
@@ -55,6 +58,8 @@ call "%__engNativeDir%\version\copy_version_files.cmd"
 set __cmakeRepoRoot=%__repoRoot:\=/%
 set __ExtraCmakeParams="-DCMAKE_REPO_ROOT=%__cmakeRepoRoot%"
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
+
+if /i "%__TargetOS%" == "PS4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS4")
 
 if [%__outConfig%] == [] set __outConfig=%__TargetOS%-%__BuildArch%-%CMAKE_BUILD_TYPE%
 
@@ -85,7 +90,8 @@ echo %MSBUILD_EMPTY_PROJECT_CONTENT% > "%__artifactsDir%\obj\native\Directory.Bu
 :: Regenerate the VS solution
 
 pushd "%__IntermediatesDir%"
-call "%__repoRoot%\eng\native\gen-buildsys.cmd" "%__sourceRootDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams%
+echo [libs/build-native.cmd] %__repoRoot%\eng\native\gen-buildsys.cmd "%__sourceRootDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams% %__CMakeArgs%
+call "%__repoRoot%\eng\native\gen-buildsys.cmd" "%__sourceRootDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__ExtraCmakeParams% %__CMakeArgs%
 if NOT [%errorlevel%] == [0] goto :Failure
 popd
 
@@ -100,6 +106,7 @@ if [%__Ninja%] == [1] (
     set __generatorArgs=/p:Platform=%__BuildArch% /p:PlatformToolset="%__PlatformToolset%" -noWarn:MSB8065
 )
 
+echo [libs/build-native.cmd] %CMakePath% --build %__IntermediatesDir% --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 call "%CMakePath%" --build "%__IntermediatesDir%" --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 IF ERRORLEVEL 1 (
     goto :Failure

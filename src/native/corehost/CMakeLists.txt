@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.6.2)
 
+# Custom platforms (external)
+if(TARGET_SYSTEM_NAME STREQUAL "PS4")
+  message("Build corehost/CmakeList.txt for PS4")
+  include(../../ps4/PS4Toolchain.txt)
+endif()
+
 if (CMAKE_VERSION VERSION_GREATER 3.15 OR CMAKE_VERSION VERSION_EQUAL 3.15)
     cmake_policy(SET CMP0091 NEW)
 endif()
@@ -8,6 +14,12 @@ project(corehost)
 
 include(../../../eng/native/configurepaths.cmake)
 include(${CLR_ENG_NATIVE_DIR}/configurecompiler.cmake)
+
+# Include external platform files (eg. console implementation)
+if(TARGET_SYSTEM_NAME STREQUAL "PS4")
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+endif()
 
 if (MSVC)
     # Host components don't try to handle asynchronous exceptions
@@ -25,13 +37,16 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES GNU)
 endif()
 
 add_subdirectory(hostcommon)
-add_subdirectory(fxr)
-add_subdirectory(hostpolicy)
-
-add_subdirectory(apphost)
-add_subdirectory(dotnet)
 add_subdirectory(nethost)
-add_subdirectory(test)
+add_subdirectory(fxr)
+
+if(CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
+else()
+    add_subdirectory(hostpolicy)
+    add_subdirectory(apphost)
+    add_subdirectory(dotnet)
+    add_subdirectory(test)
+endif()
 
 if (NOT RUNTIME_FLAVOR STREQUAL Mono)
     if(CLR_CMAKE_TARGET_WIN32)

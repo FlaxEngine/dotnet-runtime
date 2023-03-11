@@ -81,6 +81,8 @@
 #define FALLBACK_HOST_RID _X("illumos")
 #elif defined(TARGET_SUNOS)
 #define FALLBACK_HOST_RID _X("solaris")
+#elif defined(TARGET_PS4)
+#define FALLBACK_HOST_RID _X("ps4")
 #elif defined(TARGET_LINUX_MUSL)
 #define FALLBACK_HOST_RID _X("linux-musl")
 #elif defined(TARGET_ANDROID)
@@ -329,9 +331,11 @@ namespace pal
     bool get_default_breadcrumb_store(string_t* recv);
     bool is_path_rooted(const string_t& path);
 
+#if !defined(TARGET_PS4)
     // Returns a platform-specific, user-private directory
     // that can be used for extracting out components of a single-file app.
     bool get_default_bundle_extraction_base_dir(string_t& extraction_dir);
+#endif
 
     int xtoi(const char_t* input);
 

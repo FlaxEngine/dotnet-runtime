@@ -9,7 +9,9 @@ set(PRERELEASE 0)
 #     - for non-windows build platform & architecture is detected using inbuilt CMAKE variables and cross target component configure
 #     - for windows we use the passed in parameter to CMAKE to determine build arch
 #----------------------------------------
-set(CLR_CMAKE_HOST_OS ${CMAKE_SYSTEM_NAME})
+if (NOT DEFINED CLR_CMAKE_HOST_OS OR CLR_CMAKE_HOST_OS STREQUAL "" )
+  set(CLR_CMAKE_HOST_OS ${CMAKE_SYSTEM_NAME})
+endif()
 if(CLR_CMAKE_HOST_OS STREQUAL Linux)
     set(CLR_CMAKE_HOST_UNIX 1)
     if(CLR_CROSS_COMPONENTS_BUILD)
@@ -171,6 +173,12 @@ if(CLR_CMAKE_HOST_OS STREQUAL OpenBSD)
     set(CLR_CMAKE_HOST_UNIX_AMD64 1)
     set(CLR_CMAKE_HOST_OPENBSD 1)
 endif(CLR_CMAKE_HOST_OS STREQUAL OpenBSD)
+
+if(CLR_CMAKE_HOST_OS STREQUAL PS4)
+    set(CLR_CMAKE_HOST_UNIX 1)
+    set(CLR_CMAKE_HOST_UNIX_AMD64 1)
+    set(CLR_CMAKE_HOST_PS4 1)
+endif(CLR_CMAKE_HOST_OS STREQUAL PS4)
 
 if(CLR_CMAKE_HOST_OS STREQUAL NetBSD)
     set(CLR_CMAKE_HOST_UNIX 1)
@@ -393,6 +401,11 @@ if(CLR_CMAKE_TARGET_OS STREQUAL NetBSD)
     set(CLR_CMAKE_TARGET_UNIX 1)
     set(CLR_CMAKE_TARGET_NETBSD 1)
 endif(CLR_CMAKE_TARGET_OS STREQUAL NetBSD)
+
+if(CLR_CMAKE_TARGET_OS STREQUAL PS4)
+    set(CLR_CMAKE_TARGET_UNIX 1)
+    set(CLR_CMAKE_TARGET_PS4 1)
+endif(CLR_CMAKE_TARGET_OS STREQUAL PS4)
 
 if(CLR_CMAKE_TARGET_OS STREQUAL SunOS)
     set(CLR_CMAKE_TARGET_UNIX 1)

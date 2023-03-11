@@ -32,7 +32,8 @@
 
 #include <errno.h>
 
-#if defined(_POSIX_VERSION) && !defined (HOST_WASM)
+#if defined(__ORBIS__)
+#elif defined(_POSIX_VERSION) && !defined (HOST_WASM)
 
 #include <pthread.h>
 

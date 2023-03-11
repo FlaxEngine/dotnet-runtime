@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.6.2)
+# Custom platforms (external)
+if(TARGET_SYSTEM_NAME STREQUAL "PS4")
+  message("Build libs/CmakeList.txt for PS4")
+  include(../../ps4/PS4Toolchain.txt)
+endif()
+
 include(CheckCCompilerFlag)
 
 if (CLR_CMAKE_TARGET_IOS OR CLR_CMAKE_TARGET_TVOS)
@@ -43,7 +49,14 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER)
     endif ()
 
     set(CMAKE_INSTALL_PREFIX $ENV{__CMakeBinDir})
+    if(CLR_CMAKE_TARGET_PS4)
+        include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+        add_definitions(-include fwd_decls.h)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-declaration-after-statement")
+        add_definitions(-include fwd_decls.h)
+    else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wno-declaration-after-statement")
+    endif()
 
     add_compile_options(-I${CMAKE_CURRENT_SOURCE_DIR}/Common)
     add_compile_options(-I${CMAKE_CURRENT_BINARY_DIR}/Common)
@@ -156,6 +169,8 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER)
     add_subdirectory(System.Native)
 
     if (CLR_CMAKE_TARGET_BROWSER)
+        # skip for now
+    elseif (CLR_CMAKE_TARGET_PS4)
         # skip for now
     elseif (CLR_CMAKE_TARGET_MACCATALYST)
         add_subdirectory(System.Net.Security.Native)

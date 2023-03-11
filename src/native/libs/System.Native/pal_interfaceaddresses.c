@@ -8,6 +8,30 @@
 #include "pal_safecrt.h"
 #include "pal_networking.h"
 
+#if TARGET_PS4
+
+/* Not implemented */
+
+int32_t SystemNative_EnumerateInterfaceAddresses(void* context, IPv4AddressFound onIpv4Found, IPv6AddressFound onIpv6Found, LinkLayerAddressFound onLinkLayerFound)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int32_t SystemNative_GetNetworkInterfaces(int32_t * interfaceCount, NetworkInterfaceInfo **interfaceList, int32_t * addressCount, IpAddressInfo **addressList )
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int32_t SystemNative_EnumerateGatewayAddressesForInterface(void* context, uint32_t interfaceIndex, GatewayAddressFound onGatewayFound)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+#else
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <assert.h>
@@ -646,3 +670,5 @@ int32_t SystemNative_EnumerateGatewayAddressesForInterface(void* context, uint32
     return -1;
 }
 #endif // HAVE_RT_MSGHDR
+
+#endif

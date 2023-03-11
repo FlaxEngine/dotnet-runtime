@@ -9,7 +9,7 @@
     <Dependency Include="Microsoft.NETCore.DotNetHostResolver" VersionProp="HostResolverVersion" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(PackageTargetRuntime)' != ''">
+  <ItemGroup Condition="'$(PackageTargetRuntime)' != '' AND '$(TargetOS)' != 'PS4'">
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)hostpolicy$(LibSuffix)"/>
     <File Include="@(NativeBinary)">
       <TargetPath>runtimes/$(PackageTargetRuntime)/native</TargetPath>

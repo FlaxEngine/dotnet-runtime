@@ -6,6 +6,52 @@
 #include "pal_uid.h"
 #include "pal_utilities.h"
 
+#if TARGET_PS4
+
+/* Not supported */
+
+int32_t SystemNative_GetPwUidR(uint32_t uid, Passwd* pwd, char* buf, int32_t buflen)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetPwNamR(const char* name, Passwd* pwd, char* buf, int32_t buflen)
+{
+    return -1;
+}
+
+uint32_t SystemNative_GetEUid()
+{
+    return 0;
+}
+
+uint32_t SystemNative_GetEGid()
+{
+    return 0;
+}
+
+int32_t SystemNative_SetEUid(uint32_t euid)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetGroupList(const char* name, uint32_t group, uint32_t* groups, int32_t* ngroups)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetGroups(int32_t ngroups, uint32_t* groups)
+{
+    return -1;
+}
+
+char* SystemNative_GetGroupName(uint32_t gid)
+{
+    return NULL;
+}
+
+#else
+
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -302,3 +348,5 @@ char* SystemNative_GetGroupName(uint32_t gid)
     return name;
 #endif
 }
+
+#endif

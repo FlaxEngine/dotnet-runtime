@@ -8,6 +8,22 @@
 #include "pal_types.h"
 #include "pal_utilities.h"
 
+#if TARGET_PS4
+
+/* Not implemented */
+
+Error SystemNative_CreateNetworkChangeListenerSocket(intptr_t* retSocket)
+{
+    return Error_SUCCESS;
+}
+
+Error SystemNative_ReadEvents(intptr_t sock, NetworkChangeEvent onNetworkChange)
+{
+    return Error_SUCCESS;
+}
+
+#else
+
 #include <errno.h>
 #include <net/if.h>
 #include <sys/socket.h>
@@ -179,4 +195,6 @@ Error SystemNative_ReadEvents(intptr_t sock, NetworkChangeEvent onNetworkChange)
     abort();
     return Error_SUCCESS;
 }
+#endif
+
 #endif

@@ -25,6 +25,8 @@
 #include <mach-o/dyld.h>
 #include <sys/param.h>
 #include <sys/sysctl.h>
+#elif defined(TARGET_PS4)
+#include <hostmisc.pal.unix.h>
 #elif defined(__sun)
 #include <sys/utsname.h>
 #elif defined(TARGET_FREEBSD)
@@ -330,6 +332,8 @@ bool pal::get_default_servicing_directory(string_t* recv)
     return true;
 }
 
+#if !defined(TARGET_PS4)
+
 bool is_read_write_able_directory(pal::string_t& dir)
 {
     return pal::realpath(&dir) &&
@@ -407,6 +411,8 @@ bool pal::get_default_bundle_extraction_base_dir(pal::string_t& extraction_dir)
 
     return is_read_write_able_directory(extraction_dir);
 }
+
+#endif
 
 bool pal::get_global_dotnet_dirs(std::vector<pal::string_t>* recv)
 {
@@ -723,6 +729,13 @@ pal::string_t pal::get_current_os_rid_platform()
             .append(utsname_obj.version, strlen("joyent_"), 4); // e.g. smartos.2020
     }
 
+    return ridOS;
+}
+#elif defined(TARGET_PS4)
+pal::string_t pal::get_current_os_rid_platform()
+{
+    pal::string_t ridOS;
+    ridOS.append(_X("ps4"));
     return ridOS;
 }
 #elif defined(__sun)

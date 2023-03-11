@@ -4,6 +4,17 @@
 #include "pal_config.h"
 #include "pal_maphardwaretype.h"
 
+#if TARGET_PS4
+
+/* Not implemented */
+
+uint16_t MapHardwareType(uint16_t nativeType)
+{
+    return NetworkInterfaceType_Unknown;
+}
+
+#else
+
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -114,3 +125,5 @@ uint16_t MapHardwareType(uint16_t nativeType)
     }
 #endif
 }
+
+#endif

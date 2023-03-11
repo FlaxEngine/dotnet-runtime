@@ -6,6 +6,81 @@
 #include "pal_utilities.h"
 #include "pal_signal.h"
 
+#if TARGET_PS4
+
+/* Not supported */
+
+int32_t SystemNative_GetWindowSize(WinSize* windowSize)
+{
+    return -1;
+}
+
+int32_t SystemNative_IsATty(intptr_t fd)
+{
+    return -1;
+}
+
+void SystemNative_SetKeypadXmit(const char* terminfoString)
+{
+}
+
+void UninitializeTerminal()
+{
+}
+
+void SystemNative_InitializeConsoleBeforeRead(int32_t distinguishNewLines, uint8_t minChars, uint8_t decisecondsTimeout)
+{
+}
+
+void SystemNative_UninitializeConsoleAfterRead()
+{
+}
+
+void SystemNative_ConfigureTerminalForChildProcess(int32_t childUsesTerminal)
+{
+}
+
+void SystemNative_GetControlCharacters(
+    int32_t* controlCharacterNames, uint8_t* controlCharacterValues, int32_t controlCharacterLength,
+    uint8_t* posixDisableValue)
+{
+}
+
+int32_t SystemNative_StdinReady(int32_t distinguishNewLines)
+{
+    return -1;
+}
+
+int32_t SystemNative_ReadStdin(void* buffer, int32_t bufferSize)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetSignalForBreak()
+{
+    return -1;
+}
+
+int32_t SystemNative_SetSignalForBreak(int32_t signalForBreak, int32_t distinguishNewLines)
+{
+    return -1;
+}
+
+void ReinitializeTerminal()
+{
+}
+
+static void InitializeTerminalCore()
+{
+}
+
+int32_t SystemNative_InitializeTerminalAndSignalHandling()
+{
+    return 0;
+}
+
+#else
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -479,3 +554,5 @@ int32_t SystemNative_InitializeTerminalAndSignalHandling()
 
     return initialized;
 }
+
+#endif

@@ -14,7 +14,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/param.h>
+#if HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#endif
 #elif defined(_WIN32)
 #include <windows.h>
 #elif HAVE_GETAUXVAL
@@ -45,6 +47,8 @@ static inline char* minipal_getexepath(void)
     }
 
     return realpath(path_buf, NULL);
+#elif defined(__ORBIS__)
+    return NULL;
 #elif defined(__FreeBSD__)
     static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
     char path[PATH_MAX];

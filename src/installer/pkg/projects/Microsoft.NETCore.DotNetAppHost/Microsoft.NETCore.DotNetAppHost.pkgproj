@@ -4,9 +4,11 @@
     <PackageDescription>Provides the .NET app bootstrapper intended for use in the application directory</PackageDescription>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetOS)' != 'PS4'">
     <NativeBinary Include="$(DotNetHostBinDir)/apphost$(ExeSuffix)" />
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)nethost$(LibSuffix)" />
+  </ItemGroup>
+  <ItemGroup>
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)nethost$(StaticLibSuffix)" />
     <NativeBinary Include="$(DotNetHostBinDir)/coreclr_delegates.h" />
     <NativeBinary Include="$(DotNetHostBinDir)/hostfxr.h" />

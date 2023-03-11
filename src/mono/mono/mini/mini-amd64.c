@@ -61,8 +61,10 @@ static GENERATE_TRY_GET_CLASS_WITH_CACHE (math, "System", "Math")
 /* The single step trampoline */
 static gpointer ss_trampoline;
 
+#ifndef DISABLE_JIT
 /* The breakpoint trampoline */
 static gpointer bp_trampoline;
+#endif
 
 /* Offset between fp and the first argument in the callee */
 #define ARGS_OFFSET 16

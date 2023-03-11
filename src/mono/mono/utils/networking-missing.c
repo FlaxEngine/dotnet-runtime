@@ -16,8 +16,10 @@
 #include <netdb.h>
 #endif
 
+#if defined(__ORBIS__)
+#include "networking-orbis.c"
 //wasm does have inet_pton even though autoconf fails to find
-#if !defined (HAVE_INET_PTON) && !defined (HOST_WASM)
+#elif !defined (HAVE_INET_PTON) && !defined (HOST_WASM)
 
 int
 inet_pton (int family, const char *address, void *inaddrp)

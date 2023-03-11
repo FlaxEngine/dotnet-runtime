@@ -312,7 +312,7 @@ mono_rand_open (void)
 gpointer
 mono_rand_init (const guchar *seed, gssize seed_size)
 {
-	return "srand"; // NULL will be interpreted as failure; return arbitrary nonzero pointer
+	return (gpointer)"srand"; // NULL will be interpreted as failure; return arbitrary nonzero pointer
 }
 
 gboolean

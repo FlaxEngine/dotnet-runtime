@@ -287,6 +287,11 @@
       <_MonoBuildEnv Include="TARGET_BUILD_ARCH=x64" />
     </ItemGroup>
 
+    <!-- PS4 cross build options -->
+    <ItemGroup Condition="'$(TargetsPS4)' == 'true'">
+      <_MonoCMakeArgs Include="-DTARGET_SYSTEM_NAME=PS4" />
+    </ItemGroup>
+
     <!-- Windows specific options -->
     <ItemGroup Condition="'$(TargetsWindows)' == 'true'">
       <_MonoCPPFLAGS Include="-DWIN32" />
@@ -536,6 +541,7 @@
       <_MonoSkipCMakeConfigure Condition="'$(SkipMonoCrossJitConfigure)' == 'true' or '$(_MonoCMakeCmdLineUpToDate)' == 'true'">true</_MonoSkipCMakeConfigure>
     </PropertyGroup>
     <Message Condition="'$(_MonoSkipCMakeConfigure)' == 'true'" Text="The CMake command line is the same as the last run. Skipping running CMake configure." Importance="High"/>
+    <Message Text="[mono.proj] $(_MonoCMakeConfigureCommand)" Importance="High"/>
     <Message Condition="'$(_MonoSkipCMakeConfigure)' != 'true'" Text="Running '$(_MonoCMakeConfigureCommand)' in '$(MonoObjDir)'" Importance="High"/>
     <Exec Condition="'$(_MonoSkipCMakeConfigure)' != 'true'" Command="$(_MonoCMakeConfigureCommand)" IgnoreStandardErrorWarningFormat="true" WorkingDirectory="$(MonoObjDir)"/>
     <WriteLinesToFile

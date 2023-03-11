@@ -29,6 +29,10 @@
 #endif
 #endif
 
+#if defined(__ORBIS__)
+#include "mono-proclib-orbis.c"
+#else
+
 int
 mono_process_current_pid ()
 {
@@ -232,3 +236,4 @@ mono_cpu_limit (void)
 #endif
 }
 
+#endif

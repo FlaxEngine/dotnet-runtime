@@ -5,7 +5,10 @@ add_compile_options(-Wno-incompatible-pointer-types-discards-qualifiers)
 include(${CMAKE_CURRENT_LIST_DIR}/extra_libs.cmake)
 
 set(NATIVE_LIBS_EXTRA)
+if(CLR_CMAKE_TARGET_PS4)
+elseif()
 append_extra_security_libs(NATIVE_LIBS_EXTRA)
+endif()
 
 set(NATIVEGSS_SOURCES
     pal_gssapi.c

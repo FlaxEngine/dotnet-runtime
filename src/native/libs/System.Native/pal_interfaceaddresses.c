@@ -8,7 +8,7 @@
 #include "pal_safecrt.h"
 #include "pal_networking.h"
 
-#if TARGET_PS4
+#if defined(TARGET_PS4) && TARGET_PS4
 
 /* Not implemented */
 

@@ -32,7 +32,7 @@ if(CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
 include(../../lib_static.cmake)
 install(TARGETS libhostfxr DESTINATION corehost)
 
-elseif()
+else()
 
 include(../../lib.cmake)
 include(../../lib_static.cmake)

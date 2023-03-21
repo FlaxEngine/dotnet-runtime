@@ -534,7 +534,7 @@ if (CLR_CMAKE_TARGET_PS4)
     set(HAVE_MALLOC_SIZE 0)
     set(HAVE_MALLOC_USABLE_SIZE 1)
     set(HAVE_MALLOC_USABLE_SIZE_NP 0)
-elseif()
+else()
 check_symbol_exists(
     malloc_size
     malloc/malloc.h
@@ -659,7 +659,7 @@ check_symbol_exists(
 # Custom platform
 if(CLR_CMAKE_TARGET_PS4)
     unset(PTHREAD_LIBRARY)
-elseif()
+else()
 
 check_library_exists(pthread pthread_create "" HAVE_LIBPTHREAD)
 check_library_exists(c pthread_create "" HAVE_PTHREAD_IN_LIBC)

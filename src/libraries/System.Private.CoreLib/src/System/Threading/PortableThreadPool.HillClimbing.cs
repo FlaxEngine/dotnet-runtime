@@ -171,10 +171,12 @@ namespace System.Threading
                 // Add the current thread count and throughput sample to our history
                 //
                 double throughput = numCompletions / sampleDurationSeconds;
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadAdjustmentSample(throughput);
                 }
+#endif
 
                 int sampleIndex = (int)(_totalSamples % _samplesToMeasure);
                 _samples[sampleIndex] = throughput;
@@ -347,11 +349,13 @@ namespace System.Threading
                 // Record these numbers for posterity
                 //
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadAdjustmentStats(sampleDurationSeconds, throughput, threadWaveComponent.Real, throughputWaveComponent.Real,
                         throughputErrorEstimate, _averageThroughputNoise, ratio.Real, confidence, _currentControlSetting, (ushort)newThreadWaveMagnitude);
                 }
+#endif
 
 
                 //
@@ -415,6 +419,7 @@ namespace System.Threading
 
                 _logSize++;
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadAdjustmentAdjustment(
@@ -422,6 +427,7 @@ namespace System.Threading
                         (uint)newThreadCount,
                         (NativeRuntimeEventSource.ThreadAdjustmentReasonMap)stateOrTransition);
                 }
+#endif
             }
 
             public void ForceChange(int newThreadCount, StateOrTransition state)

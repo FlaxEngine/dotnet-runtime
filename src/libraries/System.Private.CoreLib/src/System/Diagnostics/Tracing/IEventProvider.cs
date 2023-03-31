@@ -9,7 +9,9 @@ namespace System.Diagnostics.Tracing
         // Register an event provider.
         unsafe uint EventRegister(
             EventSource eventSource,
+#if FEATURE_ETW
             Interop.Advapi32.EtwEnableCallback enableCallback,
+#endif
             void* callbackContext,
             ref long registrationHandle);
 

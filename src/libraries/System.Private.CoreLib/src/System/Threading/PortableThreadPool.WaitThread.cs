@@ -37,10 +37,12 @@ namespace System.Threading
         /// <param name="handle">A description of the requested registration.</param>
         internal void RegisterWaitHandle(RegisteredWaitHandle handle)
         {
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
             {
                 NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(handle);
             }
+#endif
 
             _waitThreadLock.Acquire();
             try
@@ -72,10 +74,12 @@ namespace System.Threading
 
         internal static void CompleteWait(RegisteredWaitHandle handle, bool timedOut)
         {
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
             {
                 NativeRuntimeEventSource.Log.ThreadPoolIODequeue(handle);
             }
+#endif
 
             handle.PerformCallback(timedOut);
         }

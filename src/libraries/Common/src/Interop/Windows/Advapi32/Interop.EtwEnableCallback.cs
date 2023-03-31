@@ -4,6 +4,7 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if FEATURE_ETW
 internal static partial class Interop
 {
     internal static partial class Advapi32
@@ -30,3 +31,4 @@ internal static partial class Interop
             void* callbackContext);
     }
 }
+#endif

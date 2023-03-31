@@ -1457,6 +1457,7 @@ namespace System.Diagnostics.Tracing
 
 #region private
 
+#if FEATURE_ETW
         private unsafe void WriteEventRaw(
             string? eventName,
             ref EventDescriptor eventDescriptor,
@@ -1465,6 +1466,16 @@ namespace System.Diagnostics.Tracing
             Guid* relatedActivityID,
             int dataCount,
             IntPtr data)
+#else
+        private static unsafe void WriteEventRaw(
+            string? eventName,
+            ref EventDescriptor eventDescriptor,
+            IntPtr eventHandle,
+            Guid* activityID,
+            Guid* relatedActivityID,
+            int dataCount,
+            IntPtr data)
+#endif
         {
 #if FEATURE_MANAGED_ETW || FEATURE_PERFTRACING
             bool allAreNull = true;
@@ -2091,7 +2102,11 @@ namespace System.Diagnostics.Tracing
         // ETW and EventPipe providers. It is not a general purpose API, it will
         // log the message with Level=LogAlways and Keywords=All to make sure whoever
         // is listening gets the message.
+#if !FEATURE_MANAGED_ETW && !FEATURE_PERFTRACING
+        private static unsafe void WriteEventString(string msgString)
+#else
         private unsafe void WriteEventString(string msgString)
+#endif
         {
 #if FEATURE_MANAGED_ETW || FEATURE_PERFTRACING
             bool allAreNull = true;
@@ -2259,8 +2274,11 @@ namespace System.Diagnostics.Tracing
             return IsEnabledCommon(enable, currentLevel, currentMatchAnyKeyword, eventLevel, eventKeywords, channel);
         }
 
-        private bool IsEnabledCommon(bool enabled, EventLevel currentLevel, EventKeywords currentMatchAnyKeyword,
-                                                          EventLevel eventLevel, EventKeywords eventKeywords, EventChannel eventChannel)
+#if FEATURE_ETW
+        private bool IsEnabledCommon(bool enabled, EventLevel currentLevel, EventKeywords currentMatchAnyKeyword, EventLevel eventLevel, EventKeywords eventKeywords, EventChannel eventChannel)
+#else
+        private static bool IsEnabledCommon(bool enabled, EventLevel currentLevel, EventKeywords currentMatchAnyKeyword, EventLevel eventLevel, EventKeywords eventKeywords, EventChannel eventChannel)
+#endif
         {
             if (!enabled)
                 return false;
@@ -4667,6 +4685,11 @@ namespace System.Diagnostics.Tracing
         /// Gets the channel for the event.
         /// </summary>
         public EventChannel Channel => EventId <= 0 ? EventChannel.None : (EventChannel)Metadata.Descriptor.Channel;
+#else
+        /// <summary>
+        /// Gets the channel for the event.
+        /// </summary>
+        public EventChannel Channel => EventChannel.None;
 #endif
 
         /// <summary>
@@ -4824,7 +4847,7 @@ namespace System.Diagnostics.Tracing
 
         /// <summary>Event's task: allows logical grouping of events</summary>
         public EventTask Task { get; set; }
-#if FEATURE_MANAGED_ETW_CHANNELS
+#if FEATURE_MANAGED_ETW_CHANNELS || !FEATURE_ETW
         /// <summary>Event's channel: defines an event log as an additional destination for the event</summary>
         public EventChannel Channel { get; set; }
 #endif

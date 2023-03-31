@@ -4,11 +4,11 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <winnt.h>
+#include "mono/utils/mono-publib.h"
 
 #if defined(TARGET_AMD64) && !defined(DISABLE_JIT)
 #include "mono/mini/mini.h"
 #include "mono/mini/mini-amd64.h"
-#include "mono/utils/mono-publib.h"
 
 typedef enum _FUNCTION_TABLE_TYPE {
     RF_SORTED,

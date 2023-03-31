@@ -41,11 +41,13 @@ namespace System.Threading
                         false),
                     onWait: () =>
                     {
+#if FEATURE_PERFTRACING
                         if (NativeRuntimeEventSource.Log.IsEnabled())
                         {
                             NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadWait(
                                 (uint)ThreadPoolInstance._separated.counts.VolatileRead().NumExistingThreads);
                         }
+#endif
                     });
 
             private static readonly ThreadStart s_workerThreadStart = WorkerThreadStart;
@@ -56,11 +58,13 @@ namespace System.Threading
 
                 PortableThreadPool threadPoolInstance = ThreadPoolInstance;
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadStart(
                         (uint)threadPoolInstance._separated.counts.VolatileRead().NumExistingThreads);
                 }
+#endif
 
                 LowLevelLock threadAdjustmentLock = threadPoolInstance._threadAdjustmentLock;
                 LowLevelLifoSemaphore semaphore = s_semaphore;
@@ -149,10 +153,12 @@ namespace System.Threading
                                 HillClimbing.ThreadPoolHillClimber.ForceChange(
                                     newNumThreadsGoal,
                                     HillClimbing.StateOrTransition.ThreadTimedOut);
+#if FEATURE_PERFTRACING
                                 if (NativeRuntimeEventSource.Log.IsEnabled())
                                 {
                                     NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadStop((uint)newNumExistingThreads);
                                 }
+#endif
                                 return;
                             }
 

@@ -251,7 +251,7 @@ foreach ($argument in $PSBoundParameters.Keys)
     "allconfigurations"      { $arguments += " /p:BuildAllConfigurations=true" }
     "properties"             { $arguments += " " + $properties }
     "verbosity"              { $arguments += " -$argument " + $($PSBoundParameters[$argument]) }
-    "cmakeargs"              { $arguments += " /p:CMakeArgs=`"$($PSBoundParameters[$argument])`"" }
+    "cmakeargs"              { $arguments += " /p:CMakeArgs=`"$($PSBoundParameters[$argument].replace('-D',' -D'))`"" }
     # The -ninja switch is a no-op since Ninja is the default generator on Windows.
     "ninja"                  { }
     "msbuild"                { $arguments += " /p:Ninja=false" }

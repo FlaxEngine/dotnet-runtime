@@ -96,11 +96,13 @@ namespace System.Threading
                             continue;
                         }
 
+#if FEATURE_PERFTRACING
                         if (ThreadPool.EnableWorkerTracking && NativeRuntimeEventSource.Log.IsEnabled())
                         {
                             NativeRuntimeEventSource.Log.ThreadPoolWorkingThreadCount(
                                 (uint)threadPoolInstance.GetAndResetHighWatermarkCountOfThreadsProcessingUserCallbacks());
                         }
+#endif
 
                         int cpuUtilization = (int)cpuUtilizationReader.CurrentUtilization;
                         threadPoolInstance._cpuUtilization = cpuUtilization;

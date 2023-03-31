@@ -465,6 +465,7 @@ namespace System.Diagnostics.Tracing
                         info.WriteData(info.PropertyValueFactory(values[i]));
                     }
 
+#if FEATURE_ETW
                     this.WriteEventRaw(
                         eventName,
                         ref descriptor,
@@ -473,6 +474,7 @@ namespace System.Diagnostics.Tracing
                         childActivityID,
                         (int)(DataCollector.ThreadInstance.Finish() - descriptors),
                         (IntPtr)descriptors);
+#endif
                 }
                 finally
                 {
@@ -571,6 +573,7 @@ namespace System.Diagnostics.Tracing
                         numDescrs++;
                     }
 
+#if FEATURE_ETW
                     this.WriteEventRaw(
                         eventName,
                         ref descriptor,
@@ -579,6 +582,7 @@ namespace System.Diagnostics.Tracing
                         childActivityID,
                         numDescrs,
                         (IntPtr)descriptors);
+#endif
                 }
             }
 #endif // FEATURE_MANAGED_ETW
@@ -669,6 +673,7 @@ namespace System.Diagnostics.Tracing
                             TraceLoggingTypeInfo info = eventTypes.typeInfos[0];
                             info.WriteData(info.PropertyValueFactory(data));
 
+#if FEATURE_ETW
                             this.WriteEventRaw(
                                 eventName,
                                 ref descriptor,
@@ -677,6 +682,7 @@ namespace System.Diagnostics.Tracing
                                 pRelatedActivityId,
                                 (int)(DataCollector.ThreadInstance.Finish() - descriptors),
                                 (IntPtr)descriptors);
+#endif
 #endif // FEATURE_MANAGED_ETW
 
                             // TODO enable filtering for listeners.

@@ -127,15 +127,17 @@
     <FeatureMono>true</FeatureMono>
     <FeatureWasmThreads Condition="'$(TargetsBrowser)' == 'true' and ('$(WasmEnableThreads)' == 'true' or '$(MonoWasmBuildVariant)' == 'multithread')">true</FeatureWasmThreads>
     <FeatureWasmPerfTracing Condition="'$(TargetsBrowser)' == 'true' and ('$(WasmEnableThreads)' == 'true' or '$(WasmEnablePerfTracing)' == 'true' or '$(MonoWasmBuildVariant)' == 'multithread' or '$(MonoWasmBuildVariant)' == 'perftrace')">true</FeatureWasmPerfTracing>
-    <FeatureManagedEtwChannels>true</FeatureManagedEtwChannels>
-    <FeatureManagedEtw>true</FeatureManagedEtw>
+    <FeatureManagedEtwChannels Condition="'$(FeatureManagedEtwChannels)' == ''">true</FeatureManagedEtwChannels>
+    <FeatureManagedEtw Condition="'$(FeatureManagedEtw)' == ''">true</FeatureManagedEtw>
+    <FeatureEtw Condition="'$(FeatureEtw)' == ''">true</FeatureEtw>
     <FeaturePortableTimer Condition="'$(TargetsBrowser)' != 'true'">true</FeaturePortableTimer>
     <FeaturePortableThreadPool Condition="'$(TargetsBrowser)' != true or '$(FeatureWasmThreads)' == 'true'">true</FeaturePortableThreadPool>
-    <FeaturePerfTracing Condition="'$(TargetsBrowser)' != 'true' or '$(FeatureWasmPerftracing)' == 'true'">true</FeaturePerfTracing>
+    <FeaturePerfTracing Condition="'$(FeaturePerfTracing)' == '' and ('$(TargetsBrowser)' != 'true' or '$(FeatureWasmPerftracing)' == 'true')">true</FeaturePerfTracing>
     <FeatureObjCMarshal Condition="'$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetstvOS)' == 'true'">true</FeatureObjCMarshal>
   </PropertyGroup>
 
   <PropertyGroup>
+    <DefineConstants Condition="'$(FeatureEtw)' == 'true'">$(DefineConstants);FEATURE_ETW</DefineConstants>
     <DefineConstants Condition="'$(FeatureManagedEtw)' == 'true'">$(DefineConstants);FEATURE_MANAGED_ETW</DefineConstants>
     <DefineConstants Condition="'$(FeatureManagedEtwChannels)' == 'true'">$(DefineConstants);FEATURE_MANAGED_ETW_CHANNELS</DefineConstants>
     <DefineConstants Condition="'$(FeaturePerfTracing)' == 'true'">$(DefineConstants);FEATURE_PERFTRACING</DefineConstants>

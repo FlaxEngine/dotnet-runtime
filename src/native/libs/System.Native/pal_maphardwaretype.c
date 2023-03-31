@@ -4,7 +4,7 @@
 #include "pal_config.h"
 #include "pal_maphardwaretype.h"
 
-#if TARGET_PS4
+#if defined(TARGET_PS4) && TARGET_PS4
 
 /* Not implemented */
 
@@ -18,7 +18,12 @@ uint16_t MapHardwareType(uint16_t nativeType)
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#if defined(AF_PACKET)
+#if !defined(AF_ACKET) && HAVE_NETPACKET_PACKET_H
+// Fix for Android build
+#define AF_ACKET
+#endif
+
+#if defined(AF_ACKET)
 #if HAVE_NETPACKET_PACKET_H
 #include <netpacket/packet.h>
 #else

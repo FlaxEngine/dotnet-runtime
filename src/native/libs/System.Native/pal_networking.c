@@ -63,7 +63,7 @@
 #include <sys/filio.h>
 #endif
 
-#if TARGET_PS4
+#if defined(TARGET_PS4) && TARGET_PS4
 
 /* Not implemented */
 

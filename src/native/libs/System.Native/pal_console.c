@@ -6,7 +6,7 @@
 #include "pal_utilities.h"
 #include "pal_signal.h"
 
-#if TARGET_PS4
+#if defined(TARGET_PS4) && TARGET_PS4
 
 /* Not supported */
 

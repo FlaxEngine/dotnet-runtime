@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 
-#if TARGET_PS4
+#if defined(TARGET_PS4) && TARGET_PS4
 
 /* Not supported */
 

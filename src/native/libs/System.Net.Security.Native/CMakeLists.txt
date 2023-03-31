@@ -6,7 +6,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/extra_libs.cmake)
 
 set(NATIVE_LIBS_EXTRA)
 if(CLR_CMAKE_TARGET_PS4)
-elseif()
+else()
 append_extra_security_libs(NATIVE_LIBS_EXTRA)
 endif()
 

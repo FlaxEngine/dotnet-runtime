@@ -178,6 +178,13 @@ class OffsetsTool:
 			self.target_args += ["-arch", "arm64_32"]
 			self.target_args += ["-isysroot", args.sysroot]
 
+		# PS4
+		elif "x86_64-scei-ps4" == args.abi:
+			require_sysroot (args)
+			self.target = Target ("TARGET_AMD64", "TARGET_PS4", ["TARGET_PS4", "HOST_PS4", "MONO_CROSS_COMPILE", "USE_MONO_CTX"])
+			self.target_args += ["--target=x86_64-scei-ps4", "-Wno-macro-redefined"]
+			self.sys_includes = [args.sysroot + "/host_tools/lib/clang/include", args.sysroot + "/target/include", args.sysroot + "/target/include_common", args.mono_path + "/../ps4"]
+
 		# Android
 		elif "i686-none-linux-android" == args.abi:
 			require_sysroot (args)

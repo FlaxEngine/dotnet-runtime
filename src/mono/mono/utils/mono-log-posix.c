@@ -15,6 +15,7 @@
 #endif
 
 #if defined(__ORBIS__)
+#include "mono-logger-internals.h"
 #include "mono-log-orbis.c"
 #elif defined(_POSIX_VERSION) && !defined(HOST_WASI)
 

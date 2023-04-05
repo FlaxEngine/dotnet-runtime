@@ -133,6 +133,10 @@ mono_mem_account_register_counters (void)
 // WebAssembly implementation in mono-mmap-wasm.c
 #define HAVE_VALLOC_ALIGNED
 
+#elif defined(__ORBIS__)
+#include "mono-mmap-orbis.c"
+#define HAVE_VALLOC_ALIGNED
+
 #else
 
 #if defined(HAVE_MMAP)

@@ -43,6 +43,7 @@
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsOSX)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsBrowser)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsAndroid)' == 'true'">true</BuildMonoAOTCrossCompiler>
+    <BuildMonoAOTCrossCompiler Condition="'$(TargetsPS4)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <MonoObjCrossDir>$([MSBuild]::NormalizeDirectory('$(MonoObjDir)', 'cross'))</MonoObjCrossDir>
     <CrossConfigH Condition="'$(BuildMonoAOTCrossCompiler)' == 'true'">$([MSBuild]::NormalizePath('$(MonoObjCrossDir)', 'config.h'))</CrossConfigH>
     <MonoBundleLLVMOptimizer Condition="'$(MonoEnableLLVM)' == 'true'">true</MonoBundleLLVMOptimizer>
@@ -604,6 +605,15 @@
 
   <!-- Build AOT cross compiler (if available) -->
   <Target Name="BuildMonoCross" Condition="'$(BuildMonoAOTCrossCompiler)' == 'true'" DependsOnTargets="BuildMonoRuntime">
+
+    <!-- PS4 specific options -->
+    <PropertyGroup Condition="'$(TargetsPS4)' == 'true'">
+      <MonoUseCrossTool>true</MonoUseCrossTool>
+      <MonoAotCMakeSysroot>$(SCE_ORBIS_SDK_DIR)</MonoAotCMakeSysroot>
+      <MonoAotOffsetsFile>$(MonoObjCrossDir)offsets-ps4.h</MonoAotOffsetsFile>
+      <MonoAotAbi>x86_64-scei-ps4</MonoAotAbi>
+      <MonoLibClang>$(MonoProjectRoot)../ps4/clang/libclang.dll</MonoLibClang>
+    </PropertyGroup>
 
     <!-- iOS/tvOS specific options -->
     <PropertyGroup Condition="'$(TargetstvOS)' == 'true' or '$(TargetsiOS)' == 'true'">

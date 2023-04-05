@@ -117,7 +117,7 @@ get_method_nofail (MonoClass *klass, const char *method_name, int param_count, i
 #define RODATA_REL_SECT ".text"
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(TARGET_PS4)
 #define RODATA_SECT ".rodata"
 #elif defined(TARGET_MACH)
 #define RODATA_SECT ".section __TEXT, __const"
@@ -988,6 +988,10 @@ emit_code_bytes (MonoAotCompile *acfg, const guint8* buf, int size)
 
 #if defined(TARGET_X86) || defined(TARGET_AMD64) || defined(TARGET_ARM) || defined(TARGET_POWERPC) || defined(TARGET_ARM64) || defined (TARGET_RISCV)
 #define EMIT_DWARF_INFO 1
+#endif
+
+#ifdef TARGET_ORBIS
+#undef EMIT_DWARF_INFO
 #endif
 
 #ifdef TARGET_WIN32_MSVC

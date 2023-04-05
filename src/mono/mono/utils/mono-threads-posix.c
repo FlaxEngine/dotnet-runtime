@@ -33,7 +33,9 @@
 #include <errno.h>
 
 #if defined(__ORBIS__)
-#elif defined(_POSIX_VERSION) && !defined (HOST_WASM)
+#else
+
+#if defined(_POSIX_VERSION) && !defined (HOST_WASM)
 
 #include <pthread.h>
 
@@ -453,3 +455,5 @@ mono_threads_suspend_init (void)
 }
 
 #endif /* defined(USE_POSIX_BACKEND) */
+
+#endif

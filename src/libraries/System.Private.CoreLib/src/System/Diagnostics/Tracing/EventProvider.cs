@@ -1378,7 +1378,9 @@ namespace System.Diagnostics.Tracing
         private long m_allKeywordMask;                   // Match all keyword
         private List<SessionInfo>? m_liveSessions;       // current live sessions (KeyValuePair<sessionIdBit, etwSessionId>)
         private bool m_enabled;                          // Enabled flag from Trace callback
+#if FEATURE_ETW || FEATURE_PERFTRACING
         private Guid m_providerId;                       // Control Guid
+#endif
         internal bool m_disposed;                        // when true provider has unregistered
 
         [ThreadStatic]

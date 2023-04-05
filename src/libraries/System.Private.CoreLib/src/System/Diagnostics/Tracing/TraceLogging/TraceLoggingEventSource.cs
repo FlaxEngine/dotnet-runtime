@@ -24,10 +24,9 @@ namespace System.Diagnostics.Tracing
 #if FEATURE_MANAGED_ETW
         private byte[]? m_providerMetadata;
         private protected virtual ReadOnlySpan<byte> ProviderMetadata => m_providerMetadata;
-        private const string EventSourceRequiresUnreferenceMessage = "EventSource will serialize the whole object graph. Trimmer will not safely handle this case because properties may be trimmed. This can be suppressed if the object is a primitive type";
-        private const string EventSourceSuppressMessage = "Parameters to this method are primitive and are trimmer safe";
 #endif
-
+        private const string EventSourceSuppressMessage = "Parameters to this method are primitive and are trimmer safe";
+        private const string EventSourceRequiresUnreferenceMessage = "EventSource will serialize the whole object graph. Trimmer will not safely handle this case because properties may be trimmed. This can be suppressed if the object is a primitive type";
 #if FEATURE_PERFTRACING
         private readonly TraceLoggingEventHandleTable m_eventHandleTable = null!;
 #endif
@@ -391,6 +390,7 @@ namespace System.Diagnostics.Tracing
         /// the values must match the number and types of the fields described by the
         /// eventTypes parameter.
         /// </param>
+#if FEATURE_MANAGED_ETW
         private unsafe void WriteMultiMergeInner(
             string? eventName,
             ref EventSourceOptions options,
@@ -398,6 +398,15 @@ namespace System.Diagnostics.Tracing
             Guid* activityID,
             Guid* childActivityID,
             params object?[] values)
+#else
+        private static unsafe void WriteMultiMergeInner(
+            string? eventName,
+            ref EventSourceOptions options,
+            TraceLoggingEventTypes eventTypes,
+            Guid* activityID,
+            Guid* childActivityID,
+            params object?[] values)
+#endif
         {
 #if FEATURE_MANAGED_ETW
             int identity = 0;
@@ -514,6 +523,7 @@ namespace System.Diagnostics.Tracing
         /// The number and types of the values must match the number and types of the
         /// fields described by the eventTypes parameter.
         /// </param>
+#if FEATURE_MANAGED_ETW
         internal unsafe void WriteMultiMerge(
             string? eventName,
             ref EventSourceOptions options,
@@ -521,6 +531,15 @@ namespace System.Diagnostics.Tracing
             Guid* activityID,
             Guid* childActivityID,
             EventData* data)
+#else
+        internal static unsafe void WriteMultiMerge(
+            string? eventName,
+            ref EventSourceOptions options,
+            TraceLoggingEventTypes eventTypes,
+            Guid* activityID,
+            Guid* childActivityID,
+            EventData* data)
+#endif
         {
 #if FEATURE_MANAGED_ETW
             if (!this.IsEnabled())
@@ -752,7 +771,11 @@ namespace System.Diagnostics.Tracing
             }
         }
 
+#if FEATURE_MANAGED_ETW
         private void InitializeProviderMetadata()
+#else
+        private static void InitializeProviderMetadata()
+#endif
         {
 #if FEATURE_MANAGED_ETW
             bool hasProviderMetadata = ProviderMetadata.Length > 0;

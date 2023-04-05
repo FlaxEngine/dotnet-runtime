@@ -20,7 +20,7 @@
     <!-- ILLinker settings -->
     <ILLinkDirectory>$(MSBuildThisFileDirectory)ILLink\</ILLinkDirectory>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(FeatureManagedEtw)' == '' or '$(FeatureManagedEtw)' == 'true'">
     <ILLinkSubstitutionsXmls Include="$(ILLinkDirectory)ILLink.Substitutions.xml" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'Android' or '$(TargetPlatformIdentifier)' == 'iOS' or '$(TargetPlatformIdentifier)' == 'MacCatalyst' or '$(TargetPlatformIdentifier)' == 'tvOS' or '$(TargetPlatformIdentifier)' == 'Browser'">

@@ -194,6 +194,18 @@
       <Versions>1</Versions>
     </RuntimeGroup>
 
+    <RuntimeGroup Include="ps5">
+      <Parent>unix</Parent>
+      <Architectures>x64</Architectures>
+      <Versions>1</Versions>
+    </RuntimeGroup>
+
+    <RuntimeGroup Include="switch">
+      <Parent>unix</Parent>
+      <Architectures>arm64</Architectures>
+      <Versions>1</Versions>
+    </RuntimeGroup>
+
     <RuntimeGroup Include="illumos">
       <Parent>unix</Parent>
       <Architectures>x64</Architectures>

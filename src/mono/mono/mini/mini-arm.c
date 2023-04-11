@@ -789,7 +789,7 @@ mono_arch_cpu_init (void)
 	i8_align = MONO_ABI_ALIGNOF (gint64);
 #ifdef MONO_CROSS_COMPILE
 	/* Need to set the alignment of i8 since it can different on the target */
-#ifdef TARGET_ANDROID
+#if defined(TARGET_ANDROID) || defined(TARGET_SWTICH)
 	/* linux gnueabi */
 	mono_type_set_alignment (MONO_TYPE_I8, i8_align);
 #endif

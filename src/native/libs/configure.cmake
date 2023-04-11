@@ -21,6 +21,12 @@ if (CLR_CMAKE_TARGET_OSX)
 elseif (CLR_CMAKE_TARGET_PS4)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
     set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+elseif (CLR_CMAKE_TARGET_PS5)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+elseif (CLR_CMAKE_TARGET_SWITCH)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
 elseif (CLR_CMAKE_TARGET_FREEBSD)
     include_directories(SYSTEM ${CROSS_ROOTFS}/usr/local/include)
     set(CMAKE_REQUIRED_INCLUDES ${CROSS_ROOTFS}/usr/local/include)
@@ -530,10 +536,15 @@ if (CLR_CMAKE_TARGET_LINUX)
     set(HAVE_SUPPORT_FOR_DUAL_MODE_IPV4_PACKET_INFO 1)
 endif ()
 
-if (CLR_CMAKE_TARGET_PS4)
+if (CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5)
     set(HAVE_MALLOC_SIZE 0)
     set(HAVE_MALLOC_USABLE_SIZE 1)
     set(HAVE_MALLOC_USABLE_SIZE_NP 0)
+elseif (CLR_CMAKE_TARGET_SWITCH)
+    set(HAVE_MALLOC_SIZE 0)
+    set(HAVE_MALLOC_USABLE_SIZE 1)
+    set(HAVE_MALLOC_USABLE_SIZE_NP 0)
+    set(HAVE_POSIX_MEMALIGN 1)
 else()
 check_symbol_exists(
     malloc_size
@@ -657,7 +668,7 @@ check_symbol_exists(
     HAVE_CLOCK_GETTIME_NSEC_NP)
 
 # Custom platform
-if(CLR_CMAKE_TARGET_PS4)
+if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
     unset(PTHREAD_LIBRARY)
 else()
 
@@ -796,7 +807,7 @@ check_c_source_compiles(
     HAVE_MKSTEMP)
 
 # Custom platform
-if(CLR_CMAKE_TARGET_PS4)
+if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
     set(HAVE_MKSTEMPS TRUE)
     set(HAVE_MKSTEMP TRUE)
 endif()

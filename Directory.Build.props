@@ -176,6 +176,12 @@
     <_portableOS Condition="'$(TargetOS)' == 'PS4'">ps4</_portableOS>
     <_runtimeOS Condition="'$(TargetOS)' == 'PS4'">ps4</_runtimeOS>
     <_packageOS Condition="'$(TargetOS)' == 'PS4'">ps4</_packageOS>
+    <_portableOS Condition="'$(TargetOS)' == 'PS5'">ps5</_portableOS>
+    <_runtimeOS Condition="'$(TargetOS)' == 'PS5'">ps5</_runtimeOS>
+    <_packageOS Condition="'$(TargetOS)' == 'PS5'">ps5</_packageOS>
+    <_portableOS Condition="'$(TargetOS)' == 'Switch'">switch</_portableOS>
+    <_runtimeOS Condition="'$(TargetOS)' == 'Switch'">switch</_runtimeOS>
+    <_packageOS Condition="'$(TargetOS)' == 'Switch'">switch</_packageOS>
   </PropertyGroup>
 
   <PropertyGroup Label="CalculateRID">
@@ -212,6 +218,8 @@
     <Targetsillumos Condition="'$(TargetOS)' == 'illumos'">true</Targetsillumos>
     <TargetsSolaris Condition="'$(TargetOS)' == 'Solaris'">true</TargetsSolaris>
     <TargetsPS4 Condition="'$(TargetOS)' == 'PS4'">true</TargetsPS4>
+    <TargetsPS5 Condition="'$(TargetOS)' == 'PS5'">true</TargetsPS5>
+    <TargetsSwitch Condition="'$(TargetOS)' == 'Switch'">true</TargetsSwitch>
     <TargetsLinux Condition="'$(TargetOS)' == 'Linux' or '$(TargetOS)' == 'Android'">true</TargetsLinux>
     <TargetsNetBSD Condition="'$(TargetOS)' == 'NetBSD'">true</TargetsNetBSD>
     <TargetsOSX Condition="'$(TargetOS)' == 'OSX'">true</TargetsOSX>
@@ -223,7 +231,7 @@
     <TargetsAndroid Condition="'$(TargetOS)' == 'Android'">true</TargetsAndroid>
     <TargetsBrowser Condition="'$(TargetOS)' == 'Browser'">true</TargetsBrowser>
     <TargetsWindows Condition="'$(TargetOS)' == 'windows'">true</TargetsWindows>
-    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsPS4)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
+    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsPS4)' == 'true' or '$(TargetsPS5)' == 'true' or '$(TargetsSwitch)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
   </PropertyGroup>
 
   <PropertyGroup>

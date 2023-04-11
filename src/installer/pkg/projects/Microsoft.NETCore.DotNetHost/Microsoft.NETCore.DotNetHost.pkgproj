@@ -6,7 +6,7 @@
     <PackageDescription>Provides an executable implementation of the Microsoft DotNet Framework and SDK launcher module</PackageDescription>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(PackageTargetRuntime)' != '' AND '$(TargetOS)' != 'PS4'">
+  <ItemGroup Condition="'$(PackageTargetRuntime)' != '' and '$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'">
     <NativeBinary Include="$(DotNetHostBinDir)/dotnet$(ExeSuffix)" />
     <File Include="@(NativeBinary)">
       <TargetPath>runtimes/$(PackageTargetRuntime)/native</TargetPath>

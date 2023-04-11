@@ -8,7 +8,7 @@
 #include "pal_types.h"
 #include "pal_utilities.h"
 
-#if defined(TARGET_PS4) && TARGET_PS4
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
 
 /* Not implemented */
 

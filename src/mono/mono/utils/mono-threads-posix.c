@@ -32,7 +32,7 @@
 
 #include <errno.h>
 
-#if defined(__ORBIS__)
+#if defined(__ORBIS__) || defined(__PROSPERO__)
 #else
 
 #if defined(_POSIX_VERSION) && !defined (HOST_WASM)
@@ -148,6 +148,9 @@ mono_thread_info_get_system_max_stack_size (void)
 int
 mono_thread_info_get_system_max_stack_size (void)
 {
+#ifdef TARGET_SWITCH
+	return INT_MAX;
+#else
 	struct rlimit lim;
 
 	/* If getrlimit fails, we don't enforce any limits. */
@@ -157,6 +160,7 @@ mono_thread_info_get_system_max_stack_size (void)
 	if (lim.rlim_max > (rlim_t)INT_MAX)
 		return INT_MAX;
 	return (int)lim.rlim_max;
+#endif
 }
 #endif
 
@@ -380,7 +384,7 @@ mono_native_thread_processor_id_get (void)
 
 #endif /* defined(_POSIX_VERSION) */
 
-#if defined(USE_POSIX_BACKEND)
+#if defined(USE_POSIX_BACKEND) && !defined(__SWITCH__)
 
 gboolean
 mono_threads_suspend_begin_async_suspend (MonoThreadInfo *info, gboolean interrupt_kernel)

@@ -83,6 +83,10 @@
 #define FALLBACK_HOST_RID _X("solaris")
 #elif defined(TARGET_PS4)
 #define FALLBACK_HOST_RID _X("ps4")
+#elif defined(TARGET_PS5)
+#define FALLBACK_HOST_RID _X("ps5")
+#elif defined(TARGET_SWITCH)
+#define FALLBACK_HOST_RID _X("switch")
 #elif defined(TARGET_LINUX_MUSL)
 #define FALLBACK_HOST_RID _X("linux-musl")
 #elif defined(TARGET_ANDROID)
@@ -331,7 +335,7 @@ namespace pal
     bool get_default_breadcrumb_store(string_t* recv);
     bool is_path_rooted(const string_t& path);
 
-#if !defined(TARGET_PS4)
+#if !defined(TARGET_PS4) && !defined(TARGET_PS5) && !defined(TARGET_SWITCH)
     // Returns a platform-specific, user-private directory
     // that can be used for extracting out components of a single-file app.
     bool get_default_bundle_extraction_base_dir(string_t& extraction_dir);

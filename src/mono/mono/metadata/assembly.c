@@ -151,6 +151,7 @@ mono_set_assemblies_path (const char* path)
 	}
 	*dest = *splitted;
 
+#ifndef HOST_SWITCH
 	if (g_hasenv ("MONO_DEBUG"))
 		return;
 
@@ -161,6 +162,7 @@ mono_set_assemblies_path (const char* path)
 
 		splitted++;
 	}
+#endif
 }
 
 void

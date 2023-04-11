@@ -36,6 +36,10 @@ namespace System
         "SOLARIS"
 #elif TARGET_PS4
         "PS4"
+#elif TARGET_PS5
+        "PS5"
+#elif TARGET_SWITCH
+        "SWITCH"
 #else
 #error Unknown OS, add a corresponding TARGET_* constant to System.Private.CoreLib.Shared.projitems
 #endif

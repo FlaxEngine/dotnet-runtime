@@ -185,6 +185,20 @@ class OffsetsTool:
 			self.target_args += ["--target=x86_64-scei-ps4", "-Wno-macro-redefined"]
 			self.sys_includes = [args.sysroot + "/host_tools/lib/clang/include", args.sysroot + "/target/include", args.sysroot + "/target/include_common", args.mono_path + "/../ps4"]
 
+		# PS5
+		elif "x86_64-sie-ps5" == args.abi:
+			require_sysroot (args)
+			self.target = Target ("TARGET_AMD64", "TARGET_PS5", ["TARGET_PS5", "HOST_PS5", "MONO_CROSS_COMPILE", "USE_MONO_CTX"])
+			self.target_args += ["--target=x86_64-sie-ps5", "-Wno-macro-redefined"]
+			self.sys_includes = [args.sysroot + "/host_tools/lib/clang/include", args.sysroot + "/target/include", args.sysroot + "/target/include_common", args.mono_path + "/../ps5"]
+
+		# Switch
+		elif "aarch64-nintendo-nx-elf" == args.abi:
+			require_sysroot (args)
+			self.target = Target ("TARGET_ARM64", "TARGET_SWITCH", ["TARGET_SWITCH", "HOST_SWITCH", "MONO_CROSS_COMPILE", "USE_MONO_CTX"])
+			self.target_args += ["--target=aarch64-nintendo-nx-elf", "-Wno-macro-redefined"]
+			self.sys_includes = [args.sysroot + "/Include", args.sysroot + "/TargetSpecificInclude/NX-NXFP2-a64", args.mono_path + "/../switch"]
+
 		# Android
 		elif "i686-none-linux-android" == args.abi:
 			require_sysroot (args)

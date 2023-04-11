@@ -57,7 +57,7 @@
   </Target>
 
   <!-- Mobile uses a different hosting model, so we don't include the .NET host components. -->
-  <ItemGroup Condition="'$(TargetsMobile)' != 'true' AND '$(TargetOS)' != 'PS4'">
+  <ItemGroup Condition="'$(TargetsMobile)' != 'true' and '$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'">
     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/$(LibPrefix)hostpolicy$(LibSuffix)" />
     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/$(LibPrefix)hostfxr$(LibSuffix)" PackOnly="true" />
   </ItemGroup>

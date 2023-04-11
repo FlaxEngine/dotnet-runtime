@@ -46,6 +46,8 @@
 #define CONFIG_OS "haiku"
 #elif defined (TARGET_WASM)
 #define CONFIG_OS "wasm"
+#elif defined (TARGET_SWITCH)
+#define CONFIG_OS "switch"
 #else
 #warning Unknown operating system
 #define CONFIG_OS "unknownOS"

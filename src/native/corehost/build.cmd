@@ -99,6 +99,10 @@ set cm_BaseRid=%cm_BaseRid%-%__BuildArch%
 
 if /i "%__TargetOS%" == "PS4" (set cm_BaseRid=ps4-x64)
 if /i "%__TargetOS%" == "PS4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS4")
+if /i "%__TargetOS%" == "PS5" (set cm_BaseRid=ps5-x64)
+if /i "%__TargetOS%" == "PS5" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS5")
+if /i "%__TargetOS%" == "Switch" (set cm_BaseRid=switch-arm64)
+if /i "%__TargetOS%" == "Switch" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=Switch")
 
 echo Computed RID for native build is %cm_BaseRid% (os=%__TargetOS%, arch=%__BuildArch%)
 

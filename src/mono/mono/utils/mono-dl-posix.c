@@ -17,6 +17,8 @@
 
 #if defined(__ORBIS__)
 #include "mono-dl-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-dl-prospero.c"
 #elif defined(_POSIX_VERSION) && !defined (HOST_WASM)
 
 #include "mono/utils/mono-dl.h"

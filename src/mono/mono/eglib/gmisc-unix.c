@@ -102,6 +102,18 @@ g_path_is_absolute (const char *filename)
 {
 	g_return_val_if_fail (filename != NULL, FALSE);
 
+#ifdef HOST_SWITCH
+	if (*filename == '/') return FALSE;
+	gint32 len = strlen(filename);
+	for(int i = 0; i < len; i++)
+	{
+		char ch = filename[i];
+		if (ch == ':') return TRUE;
+		if (ch == '/' || ch == '\\') return FALSE;
+	}
+	return FALSE; 
+#endif
+
 	return (*filename == '/');
 }
 

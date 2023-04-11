@@ -33,6 +33,8 @@
 #include "../utils/mono-errno.h"
 #if defined(__ORBIS__)
 #include "gdir-orbis.c"
+#elif defined(__PROSPERO__)
+#include "gdir-prospero.c"
 #else
 #include <sys/types.h>
 #include <sys/stat.h>

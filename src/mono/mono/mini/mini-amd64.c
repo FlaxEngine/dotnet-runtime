@@ -4359,7 +4359,7 @@ mono_arch_have_fast_tls (void)
 	inited = TRUE;
 
 	return have_fast_tls;
-#elif defined(TARGET_ANDROID)
+#elif defined(TARGET_ANDROID) || defined(TARGET_SWTICH)
 	return FALSE;
 #else
 	if (mini_debug_options.use_fallback_tls)

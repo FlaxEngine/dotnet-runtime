@@ -5,7 +5,7 @@ add_compile_options(-Wno-incompatible-pointer-types-discards-qualifiers)
 include(${CMAKE_CURRENT_LIST_DIR}/extra_libs.cmake)
 
 set(NATIVE_LIBS_EXTRA)
-if(CLR_CMAKE_TARGET_PS4)
+if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
 else()
 append_extra_security_libs(NATIVE_LIBS_EXTRA)
 endif()

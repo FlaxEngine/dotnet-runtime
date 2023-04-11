@@ -2178,7 +2178,7 @@ major_free_swept_blocks (size_t section_reserve)
 {
 	SGEN_ASSERT (0, sweep_state == SWEEP_STATE_SWEPT, "Sweeping must have finished before freeing blocks");
 
-#if defined(HOST_WIN32) || defined(HOST_PS4) || defined (HOST_WASM)
+#if defined(HOST_WIN32) || defined(HOST_PS4) || defined(HOST_PS5) || defined(HOST_SWITCH) || defined (HOST_WASM)
 		/*
 		 * sgen_free_os_memory () asserts in mono_vfree () because windows doesn't like freeing the middle of
 		 * a VirtualAlloc ()-ed block.

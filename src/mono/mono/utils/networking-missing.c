@@ -18,6 +18,9 @@
 
 #if defined(__ORBIS__)
 #include "networking-orbis.c"
+#elif defined(__PROSPERO__)
+#include "networking-prospero.c"
+#elif defined(__SWITCH__)
 //wasm does have inet_pton even though autoconf fails to find
 #elif !defined (HAVE_INET_PTON) && !defined (HOST_WASM)
 

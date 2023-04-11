@@ -82,6 +82,10 @@
 
 #if defined(__ORBIS__)
 #include "mini-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mini-prospero.c"
+#elif defined(__SWITCH__)
+#include "mini-switch.c"
 #else
 
 #ifdef HOST_DARWIN

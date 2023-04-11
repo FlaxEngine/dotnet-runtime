@@ -48,19 +48,19 @@
     <Copy SourceFiles="@(HostFxrFile)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)host\fxr\$(ProductVersion)"
           SkipUnchangedFiles="true"
-          Condition="'$(TargetOS)' != 'PS4'"
+          Condition="'$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <Copy SourceFiles="@(HostPolicyFile)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)shared\Microsoft.NETCore.App\$(ProductVersion)"
           SkipUnchangedFiles="true"
-          Condition="'$(TargetOS)' != 'PS4'"
+          Condition="'$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <Copy SourceFiles="@(DotnetExe)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)"
           SkipUnchangedFiles="true"
-          Condition="'$(TargetOS)' != 'PS4'"
+          Condition="'$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <Copy Condition="$(CopyCoreDisToolsToCoreRoot)"

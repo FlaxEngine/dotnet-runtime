@@ -22,6 +22,9 @@
 #ifndef HOST_WIN32
 #include <sys/socket.h>
 #endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
 #ifdef HOST_WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>

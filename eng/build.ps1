@@ -6,7 +6,7 @@ Param(
   [string][Alias('f')]$framework,
   [string]$vs,
   [string][Alias('v')]$verbosity = "minimal",
-  [ValidateSet("windows","Linux","OSX","Android","Browser","PS4")][string]$os,
+  [ValidateSet("windows","Linux","OSX","Android","Browser","PS4","PS5","Switch")][string]$os,
   [switch]$allconfigurations,
   [switch]$coverage,
   [string]$testscope,

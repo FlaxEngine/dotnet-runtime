@@ -47,7 +47,7 @@ static inline char* minipal_getexepath(void)
     }
 
     return realpath(path_buf, NULL);
-#elif defined(__ORBIS__)
+#elif defined(__ORBIS__) || defined(__PROSPERO__)
     return NULL;
 #elif defined(__FreeBSD__)
     static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };

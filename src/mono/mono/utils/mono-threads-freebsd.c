@@ -6,6 +6,8 @@
 
 #if defined(__ORBIS__)
 #include "mono-threads-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-threads-prospero.c"
 #elif defined(__FreeBSD__)
 
 #include <mono/utils/mono-threads.h>

@@ -136,6 +136,9 @@ mono_mem_account_register_counters (void)
 #elif defined(__ORBIS__)
 #include "mono-mmap-orbis.c"
 #define HAVE_VALLOC_ALIGNED
+#elif defined(__PROSPERO__)
+#include "mono-mmap-prospero.c"
+#define HAVE_VALLOC_ALIGNED
 
 #else
 

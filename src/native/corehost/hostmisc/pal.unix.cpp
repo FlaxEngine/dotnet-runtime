@@ -25,7 +25,7 @@
 #include <mach-o/dyld.h>
 #include <sys/param.h>
 #include <sys/sysctl.h>
-#elif defined(TARGET_PS4)
+#elif defined(TARGET_PS4) || defined(TARGET_PS5)
 #include <hostmisc.pal.unix.h>
 #elif defined(__sun)
 #include <sys/utsname.h>
@@ -332,7 +332,7 @@ bool pal::get_default_servicing_directory(string_t* recv)
     return true;
 }
 
-#if !defined(TARGET_PS4)
+#if !defined(TARGET_PS4) && !defined(TARGET_PS5) && !defined(TARGET_SWITCH)
 
 bool is_read_write_able_directory(pal::string_t& dir)
 {
@@ -736,6 +736,20 @@ pal::string_t pal::get_current_os_rid_platform()
 {
     pal::string_t ridOS;
     ridOS.append(_X("ps4"));
+    return ridOS;
+}
+#elif defined(TARGET_PS5)
+pal::string_t pal::get_current_os_rid_platform()
+{
+    pal::string_t ridOS;
+    ridOS.append(_X("ps5"));
+    return ridOS;
+}
+#elif defined(TARGET_SWITCH)
+pal::string_t pal::get_current_os_rid_platform()
+{
+    pal::string_t ridOS;
+    ridOS.append(_X("switch"));
     return ridOS;
 }
 #elif defined(__sun)

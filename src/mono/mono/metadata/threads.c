@@ -728,7 +728,9 @@ mono_thread_internal_set_priority (MonoInternalThread *internal, MonoThreadPrior
 	{
 		switch (policy) {
 		case SCHED_FIFO:
+#ifdef SCHED_RR
 		case SCHED_RR:
+#endif
 			param.sched_priority = 50;
 			break;
 #ifdef SCHED_BATCH

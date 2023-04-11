@@ -63,11 +63,9 @@
 #include <sys/filio.h>
 #endif
 
-#if defined(TARGET_PS4) && TARGET_PS4
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
 
 /* Not implemented */
-
-//#include <pal_networking_orbis.h>
 
 int32_t SystemNative_GetHostEntryForName(const uint8_t* address, int32_t addressFamily, HostEntry* entry)
 {

@@ -60,6 +60,8 @@ set __ExtraCmakeParams="-DCMAKE_REPO_ROOT=%__cmakeRepoRoot%"
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
 
 if /i "%__TargetOS%" == "PS4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS4")
+if /i "%__TargetOS%" == "PS5" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=PS5")
+if /i "%__TargetOS%" == "Switch" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=Switch")
 
 if [%__outConfig%] == [] set __outConfig=%__TargetOS%-%__BuildArch%-%CMAKE_BUILD_TYPE%
 

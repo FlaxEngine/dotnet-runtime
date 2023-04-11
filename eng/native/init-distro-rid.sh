@@ -91,6 +91,10 @@ initNonPortableDistroRid()
         nonPortableBuildID=solaris."$__solaris_major_version"-"$buildArch"
     elif [ "$targetOs" = "PS4" ]; then
         nonPortableBuildID=ps4-"$buildArch"
+    elif [ "$targetOs" = "PS5" ]; then
+        nonPortableBuildID=ps5-"$buildArch"
+    elif [ "$targetOs" = "Switch" ]; then
+        nonPortableBuildID=switch-"$buildArch"
     fi
 
     if [ -n "${nonPortableBuildID}" ]; then
@@ -196,6 +200,10 @@ initDistroRidGlobal()
                 distroRid="solaris-$buildArch"
             elif [ "$targetOs" = "PS4" ]; then
                 distroRid="ps4-$buildArch"
+            elif [ "$targetOs" = "PS5" ]; then
+                distroRid="ps5-$buildArch"
+            elif [ "$targetOs" = "Switch" ]; then
+                distroRid="switch-$buildArch"
             fi
         fi
 

@@ -369,3 +369,5 @@ run-stress-*
 
 # External platforms implementation
 src/ps4/
+src/ps5/
+src/switch/

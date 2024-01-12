@@ -80,6 +80,14 @@
 #include "jit-icalls.h"
 #include <glib.h>
 
+#if defined(__ORBIS__)
+#include "mini-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mini-prospero.c"
+#elif defined(__SWITCH__)
+#include "mini-switch.c"
+#else
+
 #ifdef HOST_DARWIN
 #include <mach/mach.h>
 #include <mach/mach_time.h>
@@ -1009,5 +1017,7 @@ mono_thread_state_init_from_handle (MonoThreadUnwindState *tctx, MonoThreadInfo 
 	g_error ("Posix systems don't support mono_thread_state_init_from_handle");
 	return FALSE;
 }
+
+#endif
 
 #endif

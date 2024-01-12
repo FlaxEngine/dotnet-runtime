@@ -13,7 +13,8 @@
 
 #include "mono-threads.h"
 
-#if defined(USE_POSIX_BACKEND)
+#if defined(__ORBIS__) || defined(__PROSPERO__)
+#elif defined(USE_POSIX_BACKEND)
 
 #include <errno.h>
 #include <mono/utils/mono-errno.h>

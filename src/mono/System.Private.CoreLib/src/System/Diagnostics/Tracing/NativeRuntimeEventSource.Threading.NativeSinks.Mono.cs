@@ -10,6 +10,7 @@ namespace System.Diagnostics.Tracing
     // It contains the runtime specific interop to native event sinks.
     internal sealed partial class NativeRuntimeEventSource : EventSource
     {
+#if FEATURE_PERFTRACING
         [NonEvent]
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         private static extern void LogContentionLockCreated(nint LockID, nint AssociatedObjectID, ushort ClrInstanceID);
@@ -97,5 +98,6 @@ namespace System.Diagnostics.Tracing
             IntPtr NativeOverlapped,
             IntPtr Overlapped,
             ushort ClrInstanceID);
+#endif
     }
 }

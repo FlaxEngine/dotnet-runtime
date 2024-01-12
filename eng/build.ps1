@@ -6,7 +6,7 @@ Param(
   [string][Alias('f')]$framework,
   [string]$vs,
   [string][Alias('v')]$verbosity = "minimal",
-  [ValidateSet("windows","linux","osx","android","browser","wasi")][string]$os,
+  [ValidateSet("windows","linux","osx","android","browser","wasi","ps4","ps5","switch")][string]$os,
   [switch]$allconfigurations,
   [switch]$coverage,
   [string]$testscope,
@@ -265,7 +265,7 @@ foreach ($argument in $PSBoundParameters.Keys)
     "allconfigurations"      { $arguments += " /p:BuildAllConfigurations=true" }
     "properties"             { $arguments += " " + $properties }
     "verbosity"              { $arguments += " -$argument " + $($PSBoundParameters[$argument]) }
-    "cmakeargs"              { $arguments += " /p:CMakeArgs=`"$($PSBoundParameters[$argument])`"" }
+    "cmakeargs"              { $arguments += " /p:CMakeArgs=`"$($PSBoundParameters[$argument].replace('-D',' -D'))`"" }
     # The -ninja switch is a no-op since Ninja is the default generator on Windows.
     "ninja"                  { }
     "msbuild"                { $arguments += " /p:Ninja=false" }

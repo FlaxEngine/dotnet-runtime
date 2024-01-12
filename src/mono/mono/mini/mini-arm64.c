@@ -99,8 +99,10 @@ MONO_DISABLE_WARNING(4334)
 /* The single step trampoline */
 static gpointer ss_trampoline;
 
+#ifndef DISABLE_JIT
 /* The breakpoint trampoline */
 static gpointer bp_trampoline;
+#endif
 
 static gboolean ios_abi;
 static gboolean enable_ptrauth;
@@ -1099,6 +1101,8 @@ gboolean
 mono_arch_have_fast_tls (void)
 {
 #if defined(TARGET_IOS) || defined(TARGET_TVOS)
+	return FALSE;
+#elif defined(TARGET_SWTICH)
 	return FALSE;
 #else
 	return TRUE;

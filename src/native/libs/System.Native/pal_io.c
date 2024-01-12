@@ -9,6 +9,12 @@
 #include "pal_safecrt.h"
 #include "pal_types.h"
 
+#if defined(TARGET_PS4) && TARGET_PS4
+#include <pal_io_orbis.h>
+#elif defined(TARGET_PS5) && TARGET_PS5
+#include <pal_io_prospero.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>

@@ -657,7 +657,8 @@ class BaseEnumeration(object):
             # add mapping from the old to the new value so using the binding with an older clang still works.
             return cls._kinds[350]
         if id >= len(cls._kinds) or cls._kinds[id] is None:
-            raise ValueError('Unknown template argument kind %d' % id)
+            return -1
+            #raise ValueError('Unknown template argument kind %d' % id)
         return cls._kinds[id]
 
     def __repr__(self):

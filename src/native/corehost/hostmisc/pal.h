@@ -96,6 +96,12 @@
     #define HOST_RID_PLATFORM "osx"
 #elif defined(TARGET_ANDROID)
     #define HOST_RID_PLATFORM "linux-bionic"
+#elif defined(TARGET_PS4)
+    #define HOST_RID_PLATFORM "ps4"
+#elif defined(TARGET_PS5)
+    #define HOST_RID_PLATFORM "ps5"
+#elif defined(TARGET_SWITCH)
+    #define HOST_RID_PLATFORM "switch"
 #else
     #define HOST_RID_PLATFORM FALLBACK_HOST_OS
 #endif
@@ -329,9 +335,11 @@ namespace pal
     bool get_default_breadcrumb_store(string_t* recv);
     bool is_path_rooted(const string_t& path);
 
+#if !defined(TARGET_PS4) && !defined(TARGET_PS5) && !defined(TARGET_SWITCH)
     // Returns a platform-specific, user-private directory
     // that can be used for extracting out components of a single-file app.
     bool get_default_bundle_extraction_base_dir(string_t& extraction_dir);
+#endif
 
     int xtoi(const char_t* input);
 

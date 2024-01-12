@@ -1,10 +1,34 @@
 cmake_minimum_required(VERSION 3.20)
 cmake_policy(SET CMP0091 NEW)
 
+# Custom platforms (external)
+if(TARGET_SYSTEM_NAME STREQUAL "ps4")
+  message("Build corehost/CMakeLists.txt for PS4")
+  include(../../ps4/PS4Toolchain.txt)
+elseif(TARGET_SYSTEM_NAME STREQUAL "ps5")
+  message("Build corehost/CMakeLists.txt for PS5")
+  include(../../ps5/PS5Toolchain.txt)
+elseif(TARGET_SYSTEM_NAME STREQUAL "switch")
+  message("Build corehost/CMakeLists.txt for Switch")
+  include(../../switch/SwitchToolchain.cmake)
+endif()
+
 project(corehost)
 
 include(../../../eng/native/configurepaths.cmake)
 include(${CLR_ENG_NATIVE_DIR}/configurecompiler.cmake)
+
+# Include external platform files (eg. console implementation)
+if(TARGET_SYSTEM_NAME STREQUAL "ps4")
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+elseif(TARGET_SYSTEM_NAME STREQUAL "ps5")
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+elseif(TARGET_SYSTEM_NAME STREQUAL "switch")
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+endif()
 
 if (MSVC)
     # Host components don't try to handle asynchronous exceptions
@@ -22,13 +46,16 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES GNU)
 endif()
 
 add_subdirectory(hostcommon)
-add_subdirectory(fxr)
-add_subdirectory(hostpolicy)
-
-add_subdirectory(apphost)
-add_subdirectory(dotnet)
 add_subdirectory(nethost)
-add_subdirectory(test)
+add_subdirectory(fxr)
+
+if(CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
+else()
+    add_subdirectory(hostpolicy)
+    add_subdirectory(apphost)
+    add_subdirectory(dotnet)
+    add_subdirectory(test)
+endif()
 
 # If there's a dynamic ASAN runtime, then install it in the directories where we put our executables.
 if (NOT "${ASAN_RUNTIME}" STREQUAL "")

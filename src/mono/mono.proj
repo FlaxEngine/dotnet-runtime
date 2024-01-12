@@ -42,6 +42,9 @@
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsBrowser)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsAndroid)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <BuildMonoAOTCrossCompiler Condition="'$(TargetsWasi)' == 'true' and !$([MSBuild]::IsOSPlatform('Windows'))">true</BuildMonoAOTCrossCompiler>
+    <BuildMonoAOTCrossCompiler Condition="'$(TargetsPS4)' == 'true'">true</BuildMonoAOTCrossCompiler>
+    <BuildMonoAOTCrossCompiler Condition="'$(TargetsPS5)' == 'true'">true</BuildMonoAOTCrossCompiler>
+    <BuildMonoAOTCrossCompiler Condition="'$(TargetsSwitch)' == 'true'">true</BuildMonoAOTCrossCompiler>
     <MonoObjCrossDir>$([MSBuild]::NormalizeDirectory('$(MonoObjDir)', 'cross'))</MonoObjCrossDir>
     <CrossConfigH Condition="'$(BuildMonoAOTCrossCompiler)' == 'true'">$([MSBuild]::NormalizePath('$(MonoObjCrossDir)', 'config.h'))</CrossConfigH>
     <MonoBundleLLVMOptimizer Condition="'$(MonoEnableLLVM)' == 'true'">true</MonoBundleLLVMOptimizer>
@@ -354,6 +357,21 @@
       <_MonoBuildEnv Include="TARGET_BUILD_ARCH=arm64" />
     </ItemGroup>
 
+    <!-- PS4 cross build options -->
+    <ItemGroup Condition="'$(TargetsPS4)' == 'true'">
+      <_MonoCMakeArgs Include="-DTARGET_SYSTEM_NAME=ps4" />
+    </ItemGroup>
+
+    <!-- PS5 cross build options -->
+    <ItemGroup Condition="'$(TargetsPS5)' == 'true'">
+      <_MonoCMakeArgs Include="-DTARGET_SYSTEM_NAME=ps5" />
+    </ItemGroup>
+
+    <!-- Switch cross build options -->
+    <ItemGroup Condition="'$(TargetsSwitch)' == 'true'">
+      <_MonoCMakeArgs Include="-DTARGET_SYSTEM_NAME=switch" />
+    </ItemGroup>
+
     <!-- Windows specific options -->
     <ItemGroup Condition="'$(TargetsWindows)' == 'true'">
       <_MonoCPPFLAGS Include="-DWIN32" />
@@ -654,6 +672,33 @@
     <PropertyGroup>
       <AotHostArchitecture Condition="'$(AotHostArchitecture)' == ''">$(BuildArchitecture)</AotHostArchitecture>
       <AotHostOS Condition="'$(AotHostOS)' == ''">$(HostOS)</AotHostOS>
+    </PropertyGroup>
+
+    <!-- PS4 specific options -->
+    <PropertyGroup Condition="'$(TargetsPS4)' == 'true'">
+      <MonoUseCrossTool>true</MonoUseCrossTool>
+      <MonoAotCMakeSysroot>$(SCE_ORBIS_SDK_DIR)</MonoAotCMakeSysroot>
+      <MonoAotOffsetsFile>$(MonoObjCrossDir)offsets-ps4.h</MonoAotOffsetsFile>
+      <MonoAotAbi>x86_64-scei-ps4</MonoAotAbi>
+      <MonoLibClang>$(MonoProjectRoot)../ps4/clang/libclang.dll</MonoLibClang>
+    </PropertyGroup>
+
+    <!-- PS5 specific options -->
+    <PropertyGroup Condition="'$(TargetsPS5)' == 'true'">
+      <MonoUseCrossTool>true</MonoUseCrossTool>
+      <MonoAotCMakeSysroot>$(SCE_PROSPERO_SDK_DIR)</MonoAotCMakeSysroot>
+      <MonoAotOffsetsFile>$(MonoObjCrossDir)offsets-ps5.h</MonoAotOffsetsFile>
+      <MonoAotAbi>x86_64-sie-ps5</MonoAotAbi>
+      <MonoLibClang>$(MonoProjectRoot)../ps5/clang/libclang.dll</MonoLibClang>
+    </PropertyGroup>
+
+    <!-- Switch specific options -->
+    <PropertyGroup Condition="'$(TargetsSwitch)' == 'true'">
+      <MonoUseCrossTool>true</MonoUseCrossTool>
+      <MonoAotCMakeSysroot>$(NINTENDO_SDK_ROOT)</MonoAotCMakeSysroot>
+      <MonoAotOffsetsFile>$(MonoObjCrossDir)offsets-switch.h</MonoAotOffsetsFile>
+      <MonoAotAbi>aarch64-nintendo-nx-elf</MonoAotAbi>
+      <MonoLibClang>$(NINTENDO_SDK_ROOT)/Compilers/NX/nx/aarch64/bin/libclang.dll</MonoLibClang>
     </PropertyGroup>
 
     <!-- iOS/tvOS specific options -->

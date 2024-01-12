@@ -111,6 +111,8 @@ g_mkdtemp (char *temp)
  */
 #if defined(HAVE_MKDTEMP) && !defined(_AIX)
 	return mkdtemp (g_strdup (temp));
+#elif defined(TARGET_SWITCH)
+	return NULL;
 #elif defined(HOST_WASI)
 	g_critical ("g_mkdtemp is not implemented for WASI\n");
 	return NULL;

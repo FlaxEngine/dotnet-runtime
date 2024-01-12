@@ -208,6 +208,11 @@
     <!-- On Windows, we can build for Windows and Mobile.
          For other TargetOSes, create a "win" build, built from TargetOS sources and "win" pre-built packages. -->
     <_portableOS Condition="'$(HostOS)' == 'win' and '$(TargetsMobile)' != 'true'">win</_portableOS>
+
+    <!-- Consoles use own RID -->
+    <_portableOS Condition="'$(TargetOS)' == 'ps4'">ps4</_portableOS>
+    <_portableOS Condition="'$(TargetOS)' == 'ps5'">ps5</_portableOS>
+    <_portableOS Condition="'$(TargetOS)' == 'switch'">switch</_portableOS>
   </PropertyGroup>
 
   <!-- PackageRID is used for packages needed for the target. -->
@@ -215,6 +220,11 @@
     <_packageOS>$(_portableOS)</_packageOS>
 
     <_packageOS Condition="'$(CrossBuild)' == 'true' and '$(_portableOS)' != 'linux-musl' and '$(_portableOS)' != 'linux-bionic'">$(_hostOS)</_packageOS>
+
+    <!-- Consoles use own RID -->
+    <_packageOS Condition="'$(TargetOS)' == 'ps4'">ps4</_packageOS>
+    <_packageOS Condition="'$(TargetOS)' == 'ps5'">ps5</_packageOS>
+    <_packageOS Condition="'$(TargetOS)' == 'switch'">switch</_packageOS>
 
     <!-- source-build sets PackageOS to build with non-portable rid packages that were source-built previously. -->
     <PackageRID Condition="'$(PackageOS)' != ''">$(PackageOS)-$(TargetArchitecture)</PackageRID>
@@ -264,6 +274,9 @@
     <TargetsFreeBSD Condition="'$(TargetOS)' == 'freebsd'">true</TargetsFreeBSD>
     <Targetsillumos Condition="'$(TargetOS)' == 'illumos'">true</Targetsillumos>
     <TargetsSolaris Condition="'$(TargetOS)' == 'solaris'">true</TargetsSolaris>
+    <TargetsPS4 Condition="'$(TargetOS)' == 'ps4'">true</TargetsPS4>
+    <TargetsPS5 Condition="'$(TargetOS)' == 'ps5'">true</TargetsPS5>
+    <TargetsSwitch Condition="'$(TargetOS)' == 'switch'">true</TargetsSwitch>
     <TargetsHaiku Condition="'$(TargetOS)' == 'haiku'">true</TargetsHaiku>
     <TargetsLinux Condition="'$(TargetOS)' == 'linux' or '$(TargetOS)' == 'android'">true</TargetsLinux>
     <TargetsLinuxBionic Condition="'$(_portableOS)' == 'linux-bionic'">true</TargetsLinuxBionic>
@@ -279,7 +292,7 @@
     <TargetsBrowser Condition="'$(TargetOS)' == 'browser'">true</TargetsBrowser>
     <TargetsWasi Condition="'$(TargetOS)' == 'wasi'">true</TargetsWasi>
     <TargetsWindows Condition="'$(TargetOS)' == 'windows'">true</TargetsWindows>
-    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsHaiku)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
+    <TargetsUnix Condition="'$(TargetsFreeBSD)' == 'true' or '$(Targetsillumos)' == 'true' or '$(TargetsSolaris)' == 'true' or '$(TargetsHaiku)' == 'true' or '$(TargetsLinux)' == 'true' or '$(TargetsNetBSD)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsMacCatalyst)' == 'true' or '$(TargetstvOS)' == 'true' or '$(TargetsPS4)' == 'true' or '$(TargetsPS5)' == 'true' or '$(TargetsSwitch)' == 'true' or '$(TargetsiOS)' == 'true' or '$(TargetsAndroid)' == 'true'">true</TargetsUnix>
   </PropertyGroup>
 
   <PropertyGroup>

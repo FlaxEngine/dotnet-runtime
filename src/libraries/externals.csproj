@@ -48,16 +48,19 @@
     <Copy SourceFiles="@(HostFxrFile)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)host\fxr\$(ProductVersion)"
           SkipUnchangedFiles="true"
+          Condition="'$(TargetOS)' != 'ps4' and '$(TargetOS)' != 'ps5' and '$(TargetOS)' != 'switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <Copy SourceFiles="@(HostPolicyFile)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)shared\Microsoft.NETCore.App\$(ProductVersion)"
           SkipUnchangedFiles="true"
+          Condition="'$(TargetOS)' != 'ps4' and '$(TargetOS)' != 'ps5' and '$(TargetOS)' != 'switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <Copy SourceFiles="@(DotnetExe)"
           DestinationFolder="$(NetCoreAppCurrentTestHostPath)"
           SkipUnchangedFiles="true"
+          Condition="'$(TargetOS)' != 'ps4' and '$(TargetOS)' != 'ps5' and '$(TargetOS)' != 'switch'"
           UseHardlinksIfPossible="$(UseHardlink)" />
 
     <!-- Include any native sanitizer runtimes so we can run our tests on machines without the exact same development environment. -->

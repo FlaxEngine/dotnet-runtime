@@ -9,6 +9,27 @@
 #include <errno.h>
 #include <limits.h>
 
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
+
+/* Not supported */
+
+int32_t SystemNative_GetAllMountPoints(MountPointFound onFound, void* context)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetSpaceInfoForMountPoint(const char* name, MountPointInformation* mpi)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetFormatInfoForMountPoint(const char* name, char* formatNameBuffer, int32_t bufferLength, int64_t* formatType)
+{
+    return -1;
+}
+
+#else
+
 // Check if we should use getmntinfo or /proc/mounts
 #if HAVE_MNTINFO
 #include <sys/mount.h>
@@ -177,3 +198,5 @@ SystemNative_GetFormatInfoForMountPoint(const char* name, char* formatNameBuffer
 
     return result;
 }
+
+#endif

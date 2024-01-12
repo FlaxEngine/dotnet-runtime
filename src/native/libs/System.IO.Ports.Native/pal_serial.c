@@ -10,6 +10,58 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <stdlib.h>
+
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
+
+/* Not supported */
+
+intptr_t SystemIoPortsNative_SerialPortOpen(const char * name)
+{
+    return -1;
+}
+
+int SystemIoPortsNative_SerialPortClose(intptr_t handle)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_Read(intptr_t fd, void* buffer, int32_t bufferSize)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_Write(intptr_t fd, const void* buffer, int32_t bufferSize)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_Poll(PollEvent* pollEvents, uint32_t eventCount, int32_t milliseconds, uint32_t* triggered)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_Shutdown(intptr_t socket, int32_t socketShutdown)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_ConvertErrorPlatformToPal(int32_t platformErrno)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_ConvertErrorPalToPlatform(int32_t error)
+{
+    return -1;
+}
+
+const char* SystemIoPortsNative_StrErrorR(int32_t platformErrno, char* buffer, int32_t bufferSize)
+{
+    return NULL;
+}
+
+#else
+
 #include <sys/socket.h>
 #include <pal_networking_common.h>
 
@@ -81,3 +133,5 @@ const char* SystemIoPortsNative_StrErrorR(int32_t platformErrno, char* buffer, i
 {
     return StrErrorR(platformErrno, buffer, bufferSize);
 }
+
+#endif

@@ -15,6 +15,62 @@
 #include <IOKit/serial/ioss.h>
 #endif
 
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
+
+/* Not supported */
+
+int32_t SystemIoPortsNative_TermiosGetSignal(intptr_t handle, int32_t signal)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosGetAllSignals(intptr_t handle)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosSetSignal(intptr_t handle, int32_t signal, int32_t set)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosGetSpeed(intptr_t handle)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosSetSpeed(intptr_t handle, int32_t speed)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosAvailableBytes(intptr_t handle, int32_t readBuffer)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosDiscard(intptr_t handle, int32_t queue)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosDrain(intptr_t handle)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosSendBreak(intptr_t handle, int32_t duration)
+{
+    return -1;
+}
+
+int32_t SystemIoPortsNative_TermiosReset(intptr_t handle, int32_t speed, int32_t dataBits, int32_t stopBits, int32_t parity, int32_t handshake)
+{
+    return -1;
+}
+
+#else
+
 /* This is dup of System/IO/Ports/NativeMethods.cs */
 enum
 {
@@ -559,3 +615,5 @@ int32_t SystemIoPortsNative_TermiosReset(intptr_t handle, int32_t speed, int32_t
 
     return 0;
 }
+
+#endif

@@ -392,6 +392,7 @@ mono_de_set_breakpoint (MonoMethod *method, long il_offset, EventRequest *req, M
 	MonoBreakpoint *bp;
 	MonoDomain *domain;
 	MonoMethod *m;
+	MonoVTable *vtable;
 	MonoSeqPointInfo *seq_points;
 	GPtrArray *methods;
 	GPtrArray *method_domains;
@@ -432,7 +433,10 @@ mono_de_set_breakpoint (MonoMethod *method, long il_offset, EventRequest *req, M
 		m = (MonoMethod *)g_ptr_array_index (methods, i);
 		domain = (MonoDomain *)g_ptr_array_index (method_domains, i);
 		seq_points = (MonoSeqPointInfo *)g_ptr_array_index (method_seq_points, i);
-		set_bp_in_method (domain, m, seq_points, bp, error);
+		vtable = mono_class_try_get_vtable (m->klass);
+		if (vtable && vtable->initialized)
+			set_bp_in_method (domain, m, seq_points, bp, error);
+
 	}
 
 	g_ptr_array_add (breakpoints, bp);

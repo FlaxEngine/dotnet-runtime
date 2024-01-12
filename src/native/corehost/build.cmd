@@ -29,6 +29,8 @@ if /i [%1] == [Release]     (set CMAKE_BUILD_TYPE=Release&&shift&goto Arg_Loop)
 if /i [%1] == [Debug]       (set CMAKE_BUILD_TYPE=Debug&&shift&goto Arg_Loop)
 if /i [%1] == [Checked]     (set CMAKE_BUILD_TYPE=Checked&&shift&goto Arg_Loop)
 
+if /i [%1] == [os]          ( set __TargetOS=%2&&shift&&shift&goto Arg_Loop)
+
 if /i [%1] == [AnyCPU]      (set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [x86]         (set __BuildArch=x86&&shift&goto Arg_Loop)
 if /i [%1] == [x64]         (set __BuildArch=x64&&shift&goto Arg_Loop)
@@ -95,7 +97,15 @@ if /i "%__BuildArch%" == "arm64"   (set cm_BaseRid=win10)
 :: Form the base RID to be used if we are doing a portable build
 if /i "%__PortableBuild%" == "1"   (set cm_BaseRid=win)
 set cm_BaseRid=%cm_BaseRid%-%__BuildArch%
-echo "Computed RID for native build is %cm_BaseRid%"
+
+if /i "%__TargetOS%" == "ps4" (set cm_BaseRid=ps4-x64)
+if /i "%__TargetOS%" == "ps4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=ps4")
+if /i "%__TargetOS%" == "ps5" (set cm_BaseRid=ps5-x64)
+if /i "%__TargetOS%" == "ps5" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=ps5")
+if /i "%__TargetOS%" == "switch" (set cm_BaseRid=switch-arm64)
+if /i "%__TargetOS%" == "switch" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=switch")
+
+echo Computed RID for native build is %cm_BaseRid% (os=%__TargetOS%, arch=%__BuildArch%)
 
 :: When the host runs on an unknown rid, it falls back to the output rid
 :: Strip the architecture
@@ -106,6 +116,9 @@ if "%__HostFallbackOS%" == "win"       (set __HostFallbackOS=win10)
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCLI_CMAKE_PKG_RID=%cm_BaseRid%" "-DCLI_CMAKE_FALLBACK_OS=%__HostFallbackOS%" "-DCLI_CMAKE_COMMIT_HASH=%__CommitSha%"
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DRUNTIME_FLAVOR=%__RuntimeFlavor% "
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCLI_CMAKE_RESOURCE_DIR=%__ResourcesDir%" "-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
+
+:: Ignore corehost build when building mono
+if /i "%__RuntimeFlavor%" == "mono" (exit 0)
 
 :: Regenerate the native build files
 echo Calling "%__engNativeDir%\gen-buildsys.cmd "%__sourceDir%" "%__IntermediatesDir%" %__VSVersion% %__BuildArch% %__TargetOS% %__ExtraCmakeParams%"
@@ -130,6 +143,7 @@ if [%__Ninja%] == [1] (
     set __generatorArgs=/p:Platform=%__BuildArch% /p:PlatformToolset="%__PlatformToolset%" -noWarn:MSB8065
 )
 
+echo [corehost/build.cmd] %CMakePath% --build %__IntermediatesDir% --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 call "%CMakePath%" --build "%__IntermediatesDir%" --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 IF ERRORLEVEL 1 (
     goto :Failure

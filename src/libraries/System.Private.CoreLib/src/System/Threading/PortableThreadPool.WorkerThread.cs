@@ -122,10 +122,12 @@ namespace System.Threading
                             HillClimbing.ThreadPoolHillClimber.ForceChange(
                                 newNumThreadsGoal,
                                 HillClimbing.StateOrTransition.ThreadTimedOut);
+#if FEATURE_PERFTRACING
                             if (NativeRuntimeEventSource.Log.IsEnabled())
                             {
                                 NativeRuntimeEventSource.Log.ThreadPoolWorkerThreadStop((uint)newNumExistingThreads);
                             }
+#endif
                             return true;
                         }
 

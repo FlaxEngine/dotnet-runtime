@@ -27,6 +27,13 @@ else(CLR_CMAKE_TARGET_WIN32)
     set_exports_linker_option(${EXPORTS_FILE})
 endif(CLR_CMAKE_TARGET_WIN32)
 
+if(CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
+
+include(../../lib_static.cmake)
+install(TARGETS libhostfxr DESTINATION corehost)
+
+else()
+
 include(../../lib.cmake)
 
 if(CLR_CMAKE_HOST_UNIX)
@@ -43,4 +50,6 @@ target_link_libraries(hostfxr PRIVATE libhostcommon)
 
 if (CLR_CMAKE_TARGET_ARCH_ARMV6)
     target_link_libraries(${DOTNET_PROJECT_NAME} PRIVATE atomic)
+endif()
+
 endif()

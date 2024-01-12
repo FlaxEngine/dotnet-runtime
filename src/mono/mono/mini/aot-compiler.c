@@ -117,12 +117,14 @@ get_method_nofail (MonoClass *klass, const char *method_name, int param_count, i
 #define RODATA_REL_SECT ".text"
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(TARGET_PS4) || defined(TARGET_PS5)
 #define RODATA_SECT ".rodata"
 #elif defined(TARGET_MACH)
 #define RODATA_SECT ".section __TEXT, __const"
 #elif defined(TARGET_WIN32_MSVC)
 #define RODATA_SECT ".rdata"
+#elif defined(TARGET_SWTICH)
+#define RODATA_REL_SECT ".data.rel.ro"
 #else
 #define RODATA_SECT ".text"
 #endif
@@ -1066,6 +1068,10 @@ emit_code_bytes (MonoAotCompile *acfg, const guint8* buf, int size)
 
 #if defined(TARGET_X86) || defined(TARGET_AMD64) || defined(TARGET_ARM) || defined(TARGET_POWERPC) || defined(TARGET_ARM64) || defined (TARGET_RISCV)
 #define EMIT_DWARF_INFO 1
+#endif
+
+#if defined(TARGET_PS4) || defined(TARGET_PS5)
+#undef EMIT_DWARF_INFO
 #endif
 
 #ifdef TARGET_WIN32_MSVC
@@ -10868,7 +10874,7 @@ emit_llvm_file (MonoAotCompile *acfg)
 	g_string_append_printf (acfg->llc_args, " -no-x86-call-frame-opt");
 #endif
 
-#if ( defined(TARGET_MACH) && defined(TARGET_ARM) ) || defined(TARGET_ORBIS) || defined(TARGET_X86_64_WIN32_MSVC) || defined(TARGET_ANDROID)
+#if ( defined(TARGET_MACH) && defined(TARGET_ARM) ) || defined(TARGET_PS4) || defined(TARGET_PS5) || defined(TARGET_SWITCH) || defined(TARGET_X86_64_WIN32_MSVC) || defined(TARGET_ANDROID)
 	g_string_append_printf (acfg->llc_args, " -relocation-model=pic");
 #else
 	if (llvm_acfg->aot_opts.static_link)

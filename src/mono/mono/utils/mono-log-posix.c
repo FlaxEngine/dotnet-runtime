@@ -14,7 +14,13 @@
 #include <unistd.h>
 #endif
 
-#if defined(_POSIX_VERSION) && !defined(HOST_WASI)
+#if defined(__ORBIS__)
+#include "mono-logger-internals.h"
+#include "mono-log-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-logger-internals.h"
+#include "mono-log-prospero.c"
+#elif defined(_POSIX_VERSION) && !defined(HOST_WASI)
 
 #include <stdlib.h>
 #include <stdio.h>

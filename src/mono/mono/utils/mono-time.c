@@ -119,7 +119,7 @@ gint64
 mono_msec_boottime (void)
 {
 	/* clock_gettime () is found by configure on Apple builds, but its only present from ios 10, macos 10.12, tvos 10 and watchos 3 */
-#if ((defined(HAVE_CLOCK_MONOTONIC_COARSE) || defined(HAVE_CLOCK_MONOTONIC)) && !(defined(TARGET_IOS) || defined(TARGET_OSX) || defined(TARGET_WATCHOS) || defined(TARGET_TVOS)))
+#if ((defined(HAVE_CLOCK_MONOTONIC_COARSE) || defined(HAVE_CLOCK_MONOTONIC)) && !(defined(TARGET_SWITCH) || defined(TARGET_IOS) || defined(TARGET_OSX) || defined(TARGET_WATCHOS) || defined(TARGET_TVOS)))
 	clockid_t clockType =
 	/* emscripten exposes CLOCK_MONOTONIC_COARSE but doesn't implement it */
 #if defined(HAVE_CLOCK_MONOTONIC_COARSE) && !defined(TARGET_WASM)

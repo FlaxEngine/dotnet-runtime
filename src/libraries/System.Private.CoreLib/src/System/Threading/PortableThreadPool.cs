@@ -134,6 +134,7 @@ namespace System.Threading
             _legacy_minIOCompletionThreads = 1;
             _legacy_maxIOCompletionThreads = 1000;
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
             {
                 NativeRuntimeEventSource.Log.ThreadPoolMinMaxThreads(
@@ -142,6 +143,7 @@ namespace System.Threading
                     (ushort)_legacy_minIOCompletionThreads,
                     (ushort)_legacy_maxIOCompletionThreads);
             }
+#endif
 
             _separated.counts.NumThreadsGoal = _minThreads;
 
@@ -210,6 +212,7 @@ namespace System.Threading
                     }
                 }
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolMinMaxThreads(
@@ -218,6 +221,7 @@ namespace System.Threading
                         (ushort)_legacy_minIOCompletionThreads,
                         (ushort)_legacy_maxIOCompletionThreads);
                 }
+#endif
             }
             finally
             {
@@ -280,6 +284,7 @@ namespace System.Threading
                     _separated.counts.InterlockedSetNumThreadsGoal(newMaxThreads);
                 }
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ThreadPoolMinMaxThreads(
@@ -288,6 +293,7 @@ namespace System.Threading
                         (ushort)_legacy_minIOCompletionThreads,
                         (ushort)_legacy_maxIOCompletionThreads);
                 }
+#endif
                 return true;
             }
             finally

@@ -62,8 +62,10 @@ static GENERATE_TRY_GET_CLASS_WITH_CACHE (math, "System", "Math")
 /* The single step trampoline */
 static gpointer ss_trampoline;
 
+#ifndef DISABLE_JIT
 /* The breakpoint trampoline */
 static gpointer bp_trampoline;
+#endif
 
 /* Offset between fp and the first argument in the callee */
 #define ARGS_OFFSET 16
@@ -4338,7 +4340,7 @@ mono_arch_have_fast_tls (void)
 	inited = TRUE;
 
 	return have_fast_tls;
-#elif defined(TARGET_ANDROID)
+#elif defined(TARGET_ANDROID) || defined(TARGET_SWTICH)
 	return FALSE;
 #else
 	if (mini_debug_options.use_fallback_tls)

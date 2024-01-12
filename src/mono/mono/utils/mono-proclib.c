@@ -29,6 +29,14 @@
 #endif
 #endif
 
+#if defined(__ORBIS__)
+#include "mono-proclib-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-proclib-prospero.c"
+#elif defined(__SWITCH__)
+#include "mono-proclib-switch.c"
+#else
+
 int
 mono_process_current_pid (void)
 {
@@ -232,3 +240,4 @@ mono_cpu_limit (void)
 #endif
 }
 
+#endif

@@ -67,7 +67,7 @@
        since the build produced artifacts should always version the same (even if they may not get used).
   -->
   <Target Name="BuildCoreHostUnix"
-          Condition="'$(TargetOS)' != 'windows'"
+          Condition="!$([MSBuild]::IsOsPlatform(Windows))"
           AfterTargets="Build"
           DependsOnTargets="$(BuildCoreHostDependsOn)">
     <PropertyGroup>
@@ -100,7 +100,7 @@
   </Target>
 
   <Target Name="BuildCoreHostWindows"
-          Condition="'$(TargetOS)' == 'windows'"
+          Condition="$([MSBuild]::IsOsPlatform(Windows))"
           AfterTargets="Build"
           DependsOnTargets="$(BuildCoreHostDependsOn)">
     <!-- Generate Version files -->
@@ -139,7 +139,7 @@
     <PropertyGroup>
       <BuildScript>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)', 'build.cmd'))</BuildScript>
 
-      <BuildArgs>$(Configuration) $(TargetArchitecture) commit $([MSBuild]::ValueOrDefault('$(SourceRevisionId)', 'N/A')) outputrid $(OutputRID)</BuildArgs>
+      <BuildArgs>$(Configuration) $(TargetArchitecture) commit $([MSBuild]::ValueOrDefault('$(SourceRevisionId)', 'N/A')) outputrid $(OutputRID) os $(TargetOS)</BuildArgs>
       <BuildArgs Condition="'$(ConfigureOnly)' == 'true'">$(BuildArgs) configureonly</BuildArgs>
       <BuildArgs Condition="'$(PortableBuild)' == 'true'">$(BuildArgs) portable</BuildArgs>
       <BuildArgs Condition="'$(IncrementalNativeBuild)' == 'true'">$(BuildArgs) incremental-native-build</BuildArgs>

@@ -4,7 +4,11 @@
 
 #include <config.h>
 
-#if defined(__FreeBSD__)
+#if defined(__ORBIS__)
+#include "mono-threads-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-threads-prospero.c"
+#elif defined(__FreeBSD__)
 
 #include <mono/utils/mono-threads.h>
 #include <pthread.h>

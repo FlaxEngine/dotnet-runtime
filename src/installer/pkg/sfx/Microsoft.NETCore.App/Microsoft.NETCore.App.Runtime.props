@@ -65,7 +65,7 @@
   </Target>
 
   <!-- Mobile and NativeAOT use a different hosting model, so we don't include the .NET host components. -->
-  <ItemGroup Condition="'$(TargetsMobile)' != 'true' and '$(BuildNativeAOTRuntimePack)' != 'true'">
+  <ItemGroup Condition="'$(TargetsMobile)' != 'true' and '$(BuildNativeAOTRuntimePack)' != 'true' and '$(TargetOS)' != 'ps4' and '$(TargetOS)' != 'ps5' and '$(TargetOS)' != 'switch'">
     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/$(LibPrefix)hostpolicy$(LibSuffix)" />
     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/$(LibPrefix)hostfxr$(LibSuffix)" PackOnly="true" />
   </ItemGroup>

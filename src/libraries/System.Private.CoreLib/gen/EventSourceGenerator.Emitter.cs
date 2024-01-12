@@ -63,6 +63,7 @@ namespace {ec.Namespace}
         private static void GenerateProviderMetadata(string sourceName, StringBuilder sb)
         {
             sb.Append(@"
+#if FEATURE_MANAGED_ETW
         private protected override ReadOnlySpan<byte> ProviderMetadata => new byte[] { ");
 
             byte[] metadataBytes = MetadataForString(sourceName);
@@ -72,6 +73,7 @@ namespace {ec.Namespace}
             }
 
             sb.AppendLine(@"};");
+            sb.AppendLine("#endif");
         }
 
         // From System.Private.CoreLib

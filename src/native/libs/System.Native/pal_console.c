@@ -28,7 +28,7 @@ void UninitializeTerminal()
 {
 }
 
-void SystemNative_InitializeConsoleBeforeRead(int32_t distinguishNewLines, uint8_t minChars, uint8_t decisecondsTimeout)
+void SystemNative_InitializeConsoleBeforeRead(uint8_t minChars, uint8_t decisecondsTimeout)
 {
 }
 
@@ -46,7 +46,7 @@ void SystemNative_GetControlCharacters(
 {
 }
 
-int32_t SystemNative_StdinReady(int32_t distinguishNewLines)
+int32_t SystemNative_StdinReady(void)
 {
     return -1;
 }
@@ -61,7 +61,7 @@ int32_t SystemNative_GetSignalForBreak()
     return -1;
 }
 
-int32_t SystemNative_SetSignalForBreak(int32_t signalForBreak, int32_t distinguishNewLines)
+int32_t SystemNative_SetSignalForBreak(int32_t signalForBreak)
 {
     return -1;
 }

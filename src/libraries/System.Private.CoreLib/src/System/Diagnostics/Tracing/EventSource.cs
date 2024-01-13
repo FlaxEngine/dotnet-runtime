@@ -2365,6 +2365,7 @@ namespace System.Diagnostics.Tracing
             return true;
         }
 
+#if FEATURE_ETW
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void ThrowEventSourceException(string? eventName, Exception? innerEx = null)
         {
@@ -2419,6 +2420,13 @@ namespace System.Diagnostics.Tracing
                 m_EventSourceExceptionRecurenceCount--;
             }
         }
+#else
+#pragma warning disable IDE0060
+        private static void ThrowEventSourceException(string? eventName, Exception? innerEx = null)
+        {
+        }
+#pragma warning restore IDE0060
+#endif
 
         internal static EventOpcode GetOpcodeWithDefault(EventOpcode opcode, string? eventName)
         {
@@ -3909,8 +3917,10 @@ namespace System.Diagnostics.Tracing
 
         private string[]? m_traits;                      // Used to implement GetTraits
 
+#if FEATURE_ETW
         [ThreadStatic]
         private static byte m_EventSourceExceptionRecurenceCount; // current recursion count inside ThrowEventSourceException
+#endif
 
 #if FEATURE_MANAGED_ETW_CHANNELS
         internal volatile ulong[]? m_channelData;
@@ -5305,12 +5315,14 @@ namespace System.Diagnostics.Tracing
         }
 
         /// <summary>
-        /// <term>Will NOT build a manifest!</term> If the intention is to build a manifest don’t use this constructor.
+        /// <term>Will NOT build a manifest!</term> If the intention is to build a manifest donï¿½t use this constructor.
         ///'resources, is a resource manager.  If specified all messages are localized using that manager.
         /// </summary>
         internal ManifestBuilder(ResourceManager? resources, EventManifestOptions flags)
         {
+#if FEATURE_MANAGED_ETW_CHANNELS
             providerName = "";
+#endif
 
             this.flags = flags;
 

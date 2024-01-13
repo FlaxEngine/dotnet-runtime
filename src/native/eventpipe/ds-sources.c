@@ -38,6 +38,12 @@
 #define PORTABLE_RID_OS "wasi"
 #elif defined(TARGET_WINDOWS)
 #define PORTABLE_RID_OS "win"
+#elif defined(TARGET_PS4)
+#define PORTABLE_RID_OS "ps4"
+#elif defined(TARGET_PS5)
+#define PORTABLE_RID_OS "ps5"
+#elif defined(TARGET_SWITCH)
+#define PORTABLE_RID_OS "switch"
 #else
 #error Unknown OS
 #endif

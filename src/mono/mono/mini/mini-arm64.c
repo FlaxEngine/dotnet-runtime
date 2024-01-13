@@ -107,7 +107,9 @@ static gpointer bp_trampoline;
 static gboolean ios_abi;
 static gboolean enable_ptrauth;
 
+#ifndef DISABLE_JIT
 static char opcode_simd_status[OP_LAST - OP_START];
+#endif
 
 #if defined(HOST_WIN32)
 #define WARN_UNUSED_RESULT _Check_return_
@@ -377,8 +379,10 @@ mono_arch_init (void)
 	enable_ptrauth = TRUE;
 #endif
 
+#ifndef DISABLE_JIT
 	if (!mono_aot_only)
 		bp_trampoline = mini_get_breakpoint_trampoline ();
+#endif
 
 	mono_arm_gsharedvt_init ();
 

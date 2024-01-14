@@ -1390,7 +1390,6 @@ namespace System.Diagnostics.Tracing
         }
     }
 #pragma warning restore CA1852
-    }
 #else
     /// <summary>
     /// Not supported.

@@ -16,6 +16,11 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#if TARGET_SWITCH
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 // Saved signal handlers
@@ -314,7 +319,7 @@ static void* SignalHandlerLoop(void* arg)
     assert(pipeFd >= 0);
 
     char* threadName = ".NET SigHandler";
-#if defined(__linux__) || defined(__FreeBSD__)
+#if (defined(__linux__) || defined(__FreeBSD__)) && !TARGET_PS4 && !TARGET_PS5
     pthread_setname_np(pthread_self(), threadName);
 #endif
 #if defined(__APPLE__)

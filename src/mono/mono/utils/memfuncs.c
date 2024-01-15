@@ -29,6 +29,12 @@
 #include <string.h>
 #include <errno.h>
 
+#if defined(__ORBIS__)
+#include "memfuncs-orbis.c"
+#elif defined(__PROSPERO__)
+#include "memfuncs-prospero.c"
+#else
+
 #if defined (__APPLE__)
 #include <mach/message.h>
 #include <mach/mach_host.h>
@@ -414,3 +420,5 @@ mono_determine_physical_ram_available_size (void)
 	return _DEFAULT_MEM_SIZE;
 #endif
 }
+
+#endif

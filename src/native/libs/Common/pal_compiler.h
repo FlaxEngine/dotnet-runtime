@@ -50,7 +50,7 @@ do_abort_unless (bool condition, const char* fmt, ...)
 #define abort_if_negative_integer_argument(_arg_) abort_unless ((_arg_) > 0, "Parameter '%s' must be larger than 0", #_arg_)
 
 #ifndef PALEXPORT
-#ifdef TARGET_UNIX
+#if defined(TARGET_UNIX) || defined(TARGET_SWITCH) || defined(TARGET_PS4) || defined(TARGET_PS5)
 #define PALEXPORT __attribute__ ((__visibility__ ("default")))
 #else
 #define PALEXPORT

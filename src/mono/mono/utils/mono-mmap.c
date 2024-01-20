@@ -139,6 +139,9 @@ mono_mem_account_register_counters (void)
 #elif defined(__PROSPERO__)
 #include "mono-mmap-prospero.c"
 #define HAVE_VALLOC_ALIGNED
+#elif defined(__SWITCH__)
+#include "mono-mmap-switch.c"
+#define HAVE_VALLOC_ALIGNED
 
 #else
 

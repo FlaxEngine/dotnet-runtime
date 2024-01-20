@@ -31,7 +31,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if (STATIC_LIBS_ONLY)
     # Suppress exporting of the PAL APIs
+    if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
+    else()
     add_definitions(-DPALEXPORT=EXTERN_C)
+    endif ()
 
     set(GEN_SHARED_LIB 0)
     set(STATIC_LIB_DESTINATION lib)

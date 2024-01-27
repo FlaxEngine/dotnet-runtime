@@ -317,7 +317,7 @@ mono_native_thread_set_name (MonoNativeThreadId tid, const char *name)
 		n [sizeof (n) - 1] = '\0';
 		pthread_setname_np (tid, "%s", (void*)n);
 	}
-#elif defined (HAVE_PTHREAD_SETNAME_NP)
+#elif defined (HAVE_PTHREAD_SETNAME_NP) || defined (__SWITCH__)
 #if defined (__linux__)
 	/* Ignore requests to set the main thread name because it causes the
 	 * value returned by Process.ProcessName to change.

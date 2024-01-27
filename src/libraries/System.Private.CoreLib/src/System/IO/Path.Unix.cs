@@ -137,7 +137,19 @@ namespace System.IO
 
         public static bool IsPathRooted(ReadOnlySpan<char> path)
         {
+#if TARGET_SWITCH
+            if (path.Length < 4 || path[0] == '/') return false;
+            int len = path.Length;
+            for (int i = 0; i < len; i++)
+            {
+                char ch = path[i];
+                if (ch == ':') return true;
+                if (ch == '/' || ch == '\\') return false;
+            }
+            return false;
+#else
             return path.Length > 0 && path[0] == PathInternal.DirectorySeparatorChar;
+#endif
         }
 
         /// <summary>

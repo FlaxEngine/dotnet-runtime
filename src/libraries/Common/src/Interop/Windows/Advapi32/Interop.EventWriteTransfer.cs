@@ -5,6 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Diagnostics.Tracing;
 
+#if FEATURE_ETW
 internal static partial class Interop
 {
     internal static partial class Advapi32
@@ -42,3 +43,4 @@ internal static partial class Interop
             EventProvider.EventData* userData);
     }
 }
+#endif

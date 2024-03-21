@@ -39,6 +39,5 @@
       SourceFiles="@(AsnXml -> '$(_AsnIntermediatePath)%(filename).cs')"
       DestinationFiles="@(AsnXml -> '%(Identity).cs')" />
 
-    <Warning Condition="'@(_AsnXmlDiffCode)' != '0'" Text="AsnXml regenerated files, be sure to check them in: @(AsnXml -> '%(Identity).cs')" />
   </Target>
 </Project>

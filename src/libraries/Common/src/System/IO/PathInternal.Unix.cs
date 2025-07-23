@@ -21,6 +21,10 @@ namespace System.IO
 
         internal static int GetRootLength(ReadOnlySpan<char> path)
         {
+#if TARGET_SWITCH
+            if (path.Length >= 5 && path[0] == 'r' && path[1] == 'o' && path[2] == 'm' && path[3] == ':' && path[4] == '/') return 5; // rom:/
+            if (path.Length >= 4 && path[0] == 'r' && path[1] == 'o' && path[2] == 'm' && path[3] == ':') return 4; // rom:
+#endif
             return path.Length > 0 && IsDirectorySeparator(path[0]) ? 1 : 0;
         }
 

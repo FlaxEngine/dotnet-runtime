@@ -695,7 +695,7 @@
       <MonoAotCMakeSysroot>$(NINTENDO_SDK_ROOT)</MonoAotCMakeSysroot>
       <MonoAotOffsetsFile>$(MonoObjCrossDir)offsets-switch.h</MonoAotOffsetsFile>
       <MonoAotAbi>aarch64-nintendo-nx-elf</MonoAotAbi>
-      <MonoLibClang>$(NINTENDO_SDK_ROOT)/Compilers/NX/nx/aarch64/bin/libclang.dll</MonoLibClang>
+      <MonoLibClang>$(NINTENDO_SDK_ROOT)/Compilers/NintendoClang/bin/libclang.dll</MonoLibClang>
     </PropertyGroup>
 
     <!-- iOS/tvOS specific options -->

@@ -11,7 +11,11 @@ namespace System.Security.Cryptography
         {
             Debug.Assert(count > 0);
 
+#if TARGET_SWITCH
+            Interop.GetRandomBytes(pbBuffer, count);
+#else
             Interop.GetCryptographicallySecureRandomBytes(pbBuffer, count);
+#endif
         }
     }
 }

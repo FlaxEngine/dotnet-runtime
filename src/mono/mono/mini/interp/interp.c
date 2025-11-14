@@ -2726,21 +2726,8 @@ do_jit_call (ThreadContext *context, stackval *ret_sp, stackval *sp, InterpFrame
 	interp_push_lmf (&ext, frame);
 
 	if (mono_aot_mode == MONO_AOT_MODE_LLVMONLY_INTERP) {
-#if JITERPRETER_ENABLE_SPECIALIZED_JIT_CALL
-		/*
-		 * invoke jit_call_cb via a single indirect function call that dispatches to
-		 *  either a specialized JS implementation or a specialized WASM EH version
-		 * see jiterpreter-jit-call.ts and do-jit-call.wat
-		 * NOTE: the first argument must ALWAYS be jit_call_cb for the specialization.
-		 *  the actual implementation cannot verify this at runtime, so get it right
-		 * this is faster than mono_llvm_cpp_catch_exception by avoiding the use of
-		 *  emscripten invoke_vi to find and invoke jit_call_cb indirectly
-		 */
-		jiterpreter_do_jit_call(jit_call_cb, &cb_data, &thrown);
-#else
 		/* Catch the exception thrown by the native code using a try-catch */
 		mono_llvm_cpp_catch_exception (jit_call_cb, &cb_data, &thrown);
-#endif
 	} else {
 		jit_call_cb (&cb_data);
 	}
@@ -3375,9 +3362,6 @@ interp_create_method_pointer (MonoMethod *method, gboolean compile, MonoError *e
 		return (gpointer)no_llvmonly_interp_method_pointer;
 	}
 
-	if (method->wrapper_type && method->wrapper_type == MONO_WRAPPER_MANAGED_TO_NATIVE)
-		return imethod;
-
 #ifndef MONO_ARCH_HAVE_FTNPTR_ARG_TRAMPOLINE
 	/*
 	 * Interp in wrappers get the argument in the rgctx register. If
@@ -3760,6 +3744,34 @@ max_d (double lhs, double rhs)
 static JiterpreterCallInfo jiterpreter_call_info = { 0 };
 #endif
 
+// Equivalent of mono_get_addr_compiled_method
+static gpointer
+interp_ldvirtftn_delegate (gpointer arg, MonoDelegate *del)
+{
+	MonoMethod *virtual_method = del->method;
+	ERROR_DECL(error);
+
+	MonoClass *klass = del->object.vtable->klass;
+	MonoMethod *invoke = mono_get_delegate_invoke_internal (klass);
+	MonoMethodSignature *invoke_sig = mono_method_signature_internal (invoke);
+
+	MonoClass *arg_class = NULL;
+	if (m_type_is_byref (invoke_sig->params [0])) {
+		arg_class = mono_class_from_mono_type_internal (invoke_sig->params [0]);
+	} else {
+		MonoObject *object = (MonoObject*)arg;
+		arg_class = object->vtable->klass;
+	}
+
+	MonoMethod *res = mono_class_get_virtual_method (arg_class, virtual_method, error);
+	mono_error_assert_ok (error);
+
+	gboolean need_unbox = m_class_is_valuetype (res->klass) && !m_class_is_valuetype (virtual_method->klass);
+
+	InterpMethod *imethod = mono_interp_get_imethod (res);
+	return imethod_to_ftnptr (imethod, need_unbox);
+}
+
 /*
  * If CLAUSE_ARGS is non-null, start executing from it.
  * The ERROR argument is used to avoid declaring an error object for every interp frame, its not used
@@ -4029,6 +4041,8 @@ main_loop:
 					// Not created from interpreted code
 					g_assert (del->method);
 					del_imethod = mono_interp_get_imethod (del->method);
+					if (del->target && m_method_is_virtual (del->method))
+						del_imethod = get_virtual_method (del_imethod, del->target->vtable);
 					del->interp_method = del_imethod;
 					del->interp_invoke_impl = del_imethod;
 				} else {
@@ -4058,6 +4072,9 @@ main_loop:
 			}
 			cmethod = del_imethod;
 			if (!is_multicast) {
+				int ref_slot_offset = frame->imethod->ref_slot_offset;
+				if (ref_slot_offset >= 0)
+					LOCAL_VAR (ref_slot_offset, gpointer) = del;
 				if (cmethod->param_count == param_count + 1) {
 					// Target method is static but the delegate has a target object. We handle
 					// this separately from the case below, because, for these calls, the instance
@@ -7575,6 +7592,15 @@ MINT_IN_CASE(MINT_BRTRUE_I8_SP) ZEROP_SP(gint64, !=); MINT_IN_BREAK;
 			g_assert (del->interp_method);
 			LOCAL_VAR (ip [1], gpointer) = imethod_to_ftnptr (del->interp_method, FALSE);
 			ip += 3;
+			MINT_IN_BREAK;
+		}
+		MINT_IN_CASE(MINT_LDVIRTFTN_DELEGATE) {
+			gpointer arg = LOCAL_VAR (ip [2], gpointer);
+			MonoDelegate *del = LOCAL_VAR (ip [3], MonoDelegate*);
+			NULL_CHECK (arg);
+
+			LOCAL_VAR (ip [1], gpointer) = interp_ldvirtftn_delegate (arg, del);
+			ip += 4;
 			MINT_IN_BREAK;
 		}
 

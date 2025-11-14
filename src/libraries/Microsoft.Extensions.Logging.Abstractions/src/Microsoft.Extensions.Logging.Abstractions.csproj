@@ -5,6 +5,8 @@
     <EnableDefaultItems>true</EnableDefaultItems>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <ServicingVersion>3</ServicingVersion>
     <PackageDescription>Logging abstractions for Microsoft.Extensions.Logging.
 
 Commonly Used Types:

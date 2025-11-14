@@ -590,6 +590,9 @@ if (CLR_CMAKE_HOST_UNIX)
     # other clang 16.0 suppressions
     add_compile_options(-Wno-single-bit-bitfield-constant-conversion)
     add_compile_options(-Wno-cast-function-type-strict)
+
+    # clang 18.1 supressions
+    add_compile_options(-Wno-switch-default)
   else()
     add_compile_options(-Wno-uninitialized)
     add_compile_options(-Wno-strict-aliasing)
@@ -632,9 +635,21 @@ if (CLR_CMAKE_HOST_UNIX)
     # a value for mmacosx-version-min (blank CMAKE_OSX_DEPLOYMENT_TARGET gets
     # replaced with a default value, and always gets expanded to an OS version.
     # https://gitlab.kitware.com/cmake/cmake/-/issues/20132
-    # We need to disable the warning that -tagret replaces -mmacosx-version-min
-    set(DISABLE_OVERRIDING_MIN_VERSION_ERROR -Wno-overriding-t-option)
-    add_link_options(-Wno-overriding-t-option)
+    # We need to disable the warning that -target replaces -mmacosx-version-min
+    #
+    # With https://github.com/llvm/llvm-project/commit/1c66d08b0137cef7761b8220d3b7cb7833f57cdb clang renamed the option so we need to check for both
+    check_c_compiler_flag("-Wno-overriding-option" COMPILER_SUPPORTS_W_NO_OVERRIDING_OPTION)
+    if (COMPILER_SUPPORTS_W_NO_OVERRIDING_OPTION)
+      set(DISABLE_OVERRIDING_MIN_VERSION_ERROR -Wno-overriding-option)
+    else()
+      check_c_compiler_flag("-Wno-overriding-t-option" COMPILER_SUPPORTS_W_NO_OVERRIDING_T_OPTION)
+      if (COMPILER_SUPPORTS_W_NO_OVERRIDING_T_OPTION)
+        set(DISABLE_OVERRIDING_MIN_VERSION_ERROR -Wno-overriding-t-option)
+      else()
+        message(FATAL_ERROR "Compiler does not support -Wno-overriding-option or -Wno-overriding-t-option, needed for Mac Catalyst builds.")
+      endif()
+    endif()
+    add_link_options(${DISABLE_OVERRIDING_MIN_VERSION_ERROR})
     if(CLR_CMAKE_HOST_ARCH_ARM64)
       set(MACOS_VERSION_MIN_FLAGS "-target arm64-apple-ios14.2-macabi")
       add_link_options(-target arm64-apple-ios14.2-macabi)
@@ -954,7 +969,11 @@ if (CLR_CMAKE_HOST_WIN32)
     elseif(CLR_CMAKE_HOST_ARCH_ARM64)
 
       # Explicitly specify the assembler to be used for Arm64 compile
-      file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}\\bin\\HostX86\\arm64\\armasm64.exe" CMAKE_ASM_COMPILER)
+      if (CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
+        file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}\\bin\\Hostarm64\\arm64\\armasm64.exe" CMAKE_ASM_COMPILER)
+      else()
+        file(TO_CMAKE_PATH "$ENV{VCToolsInstallDir}\\bin\\HostX64\\arm64\\armasm64.exe" CMAKE_ASM_COMPILER)
+      endif()
 
       set(CMAKE_ASM_MASM_COMPILER ${CMAKE_ASM_COMPILER})
       message("CMAKE_ASM_MASM_COMPILER explicitly set to: ${CMAKE_ASM_MASM_COMPILER}")

@@ -2558,7 +2558,18 @@ compile_special (MonoMethod *method, MonoError *error)
 		} else {
 			MonoMethod *nm = mono_marshal_get_native_wrapper (method, TRUE, mono_aot_only);
 			compiled_method = mono_jit_compile_method_jit_only (nm, error);
-			return_val_if_nok (error, NULL);
+			if (!compiled_method && mono_aot_only && mono_use_interpreter) {
+				// We failed to find wrapper in aot images, try interpreting it instead
+				mono_error_cleanup (error);
+				error_init_reuse (error);
+				nm = mono_marshal_get_native_wrapper (method, TRUE, FALSE);
+				compiled_method = mono_jit_compile_method (nm, error);
+				return_val_if_nok (error, NULL);
+				code = mono_get_addr_from_ftnptr (compiled_method);
+				return code;
+			} else {
+				return_val_if_nok (error, NULL);
+			}
 		}
 
 		code = mono_get_addr_from_ftnptr (compiled_method);
@@ -3884,7 +3895,8 @@ MONO_SIG_HANDLER_FUNC (, mono_sigsegv_signal_handler)
 		mono_handle_native_crash (mono_get_signame (SIGSEGV), &mctx, (MONO_SIG_HANDLER_INFO_TYPE*)info);
 
 		if (mono_do_crash_chaining) {
-			mono_chain_signal (MONO_SIG_HANDLER_PARAMS);
+			if (!mono_chain_signal (MONO_SIG_HANDLER_PARAMS))
+				mono_chain_signal_to_default_sigsegv_handler ();
 			return;
 		}
 	}
@@ -3894,7 +3906,8 @@ MONO_SIG_HANDLER_FUNC (, mono_sigsegv_signal_handler)
 	} else {
 		mono_handle_native_crash (mono_get_signame (SIGSEGV), &mctx, (MONO_SIG_HANDLER_INFO_TYPE*)info);
 		if (mono_do_crash_chaining) {
-			mono_chain_signal (MONO_SIG_HANDLER_PARAMS);
+			if (!mono_chain_signal (MONO_SIG_HANDLER_PARAMS))
+				mono_chain_signal_to_default_sigsegv_handler ();
 			return;
 		}
 	}

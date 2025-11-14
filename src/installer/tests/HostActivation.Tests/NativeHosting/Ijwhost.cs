@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.NativeHosting
         {
             string [] args = {
                 "ijwhost",
-                sharedState.IjwLibraryPath,
+                sharedState.IjwApp.AppDll,
                 "NativeEntryPoint"
             };
             CommandResult result = sharedState.CreateNativeHostCommand(args, sharedState.RepoDirectories.BuiltDotnet)
@@ -41,11 +41,74 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.NativeHosting
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
+        public void LoadLibrary_ContextConfig(bool load_isolated)
+        {
+            // make a copy of a portion of the shared state because we will modify it
+            using (var app = sharedState.IjwApp.Copy())
+            {
+                string[] args = {
+                    "ijwhost",
+                    app.AppDll,
+                    "NativeEntryPoint"
+                };
+
+                RuntimeConfig.FromFile(app.RuntimeConfigJson)
+                    .WithProperty("System.Runtime.InteropServices.CppCLI.LoadComponentInIsolatedContext", load_isolated.ToString())
+                    .Save();
+
+                CommandResult result = sharedState.CreateNativeHostCommand(args, sharedState.RepoDirectories.BuiltDotnet)
+                    .Execute();
+
+                result.Should().Pass()
+                    .And.HaveStdOutContaining("[C++/CLI] NativeEntryPoint: calling managed class");
+
+                if (load_isolated)  // Assembly should be loaded in an isolated context
+                {
+                    result.Should().HaveStdOutContaining("[C++/CLI] ManagedClass: AssemblyLoadContext = \"IsolatedComponentLoadContext");
+                }
+                else  // Assembly should be loaded in the default context
+                {
+                    result.Should().HaveStdOutContaining("[C++/CLI] ManagedClass: AssemblyLoadContext = \"Default\" System.Runtime.Loader.DefaultAssemblyLoadContext");
+                }
+            }
+        }
+
+        [Fact]
+        public void LoadLibrary_IgnoreWorkingDirectory()
+        {
+            using (TestArtifact cwd = TestArtifact.Create("cwd"))
+            {
+                // Validate that hosting components in the working directory will not be used
+                File.Copy(Binaries.CoreClr.MockPath, Path.Combine(cwd.Location, Binaries.CoreClr.FileName));
+                File.Copy(Binaries.HostFxr.MockPath_5_0, Path.Combine(cwd.Location, Binaries.HostFxr.FileName));
+                File.Copy(Binaries.HostPolicy.MockPath, Path.Combine(cwd.Location, Binaries.HostPolicy.FileName));
+
+                string [] args = {
+                    "ijwhost",
+                    sharedState.IjwApp.AppDll,
+                    "NativeEntryPoint"
+                };
+                var dotnet = new Microsoft.DotNet.Cli.Build.DotNetCli(sharedState.RepoDirectories.BuiltDotnet);
+                sharedState.CreateNativeHostCommand(args, sharedState.RepoDirectories.BuiltDotnet)
+                    .WorkingDirectory(cwd.Location)
+                    .Execute()
+                    .Should().Pass()
+                    .And.HaveStdOutContaining("[C++/CLI] NativeEntryPoint: calling managed class")
+                    .And.HaveStdOutContaining("[C++/CLI] ManagedClass: AssemblyLoadContext = \"Default\" System.Runtime.Loader.DefaultAssemblyLoadContext")
+                    .And.ResolveHostFxr(dotnet)
+                    .And.ResolveHostPolicy(dotnet)
+                    .And.ResolveCoreClr(dotnet);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
         public void ManagedHost(bool selfContained)
         {
             string [] args = {
                 "ijwhost",
-                sharedState.IjwLibraryPath,
+                sharedState.IjwApp.AppDll,
                 "NativeEntryPoint"
             };
             TestProjectFixture fixture = selfContained ? sharedState.ManagedHostFixture_SelfContained : sharedState.ManagedHostFixture_FrameworkDependent;
@@ -63,7 +126,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.NativeHosting
 
         public class SharedTestState : SharedTestStateBase
         {
-            public string IjwLibraryPath { get; }
+            public TestApp IjwApp {get;}
 
             public TestProjectFixture ManagedHostFixture_FrameworkDependent { get; }
             public TestProjectFixture ManagedHostFixture_SelfContained { get; }
@@ -71,7 +134,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.NativeHosting
             public SharedTestState()
             {
                 string folder = Path.Combine(BaseDirectory, "ijw");
-                Directory.CreateDirectory(folder);
+                IjwApp = new TestApp(folder, "ijw");
 
                 // Copy over ijwhost
                 string ijwhostName = "ijwhost.dll";
@@ -79,8 +142,7 @@ namespace Microsoft.DotNet.CoreSetup.Test.HostActivation.NativeHosting
 
                 // Copy over the C++/CLI test library
                 string ijwLibraryName = "ijw.dll";
-                IjwLibraryPath = Path.Combine(folder, ijwLibraryName);
-                File.Copy(Path.Combine(RepoDirectories.HostTestArtifacts, ijwLibraryName), IjwLibraryPath);
+                File.Copy(Path.Combine(RepoDirectories.HostTestArtifacts, ijwLibraryName), Path.Combine(folder, ijwLibraryName));
 
                 // Create a runtimeconfig.json for the C++/CLI test library
                 new RuntimeConfig(Path.Combine(folder, "ijw.runtimeconfig.json"))

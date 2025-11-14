@@ -117,7 +117,14 @@ internal static partial class Interop
         internal static partial IntPtr SslGetPeerCertificate(SafeSslHandle ssl);
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetPeerCertChain")]
-        internal static partial SafeSharedX509StackHandle SslGetPeerCertChain(SafeSslHandle ssl);
+        private static partial SafeSharedX509StackHandle SslGetPeerCertChain_private(SafeSslHandle ssl);
+
+        internal static SafeSharedX509StackHandle SslGetPeerCertChain(SafeSslHandle ssl)
+        {
+            return SafeInteriorHandle.OpenInteriorHandle(
+                SslGetPeerCertChain_private,
+                ssl);
+        }
 
         [LibraryImport(Libraries.CryptoNative, EntryPoint = "CryptoNative_SslGetPeerFinished")]
         internal static partial int SslGetPeerFinished(SafeSslHandle ssl, IntPtr buf, int count);
@@ -420,12 +427,6 @@ namespace Microsoft.Win32.SafeHandles
                 _writeBio?.Dispose();
             }
 
-            if (AlpnHandle.IsAllocated)
-            {
-                Interop.Ssl.SslSetData(handle, IntPtr.Zero);
-                AlpnHandle.Free();
-            }
-
             base.Dispose(disposing);
         }
 
@@ -437,6 +438,12 @@ namespace Microsoft.Win32.SafeHandles
             }
 
             SslContextHandle?.DangerousRelease();
+
+            if (AlpnHandle.IsAllocated)
+            {
+                Interop.Ssl.SslSetData(handle, IntPtr.Zero);
+                AlpnHandle.Free();
+            }
 
             IntPtr h = handle;
             SetHandle(IntPtr.Zero);

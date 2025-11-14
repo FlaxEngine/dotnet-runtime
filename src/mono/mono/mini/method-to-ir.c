@@ -3884,13 +3884,8 @@ handle_constrained_gsharedvt_call (MonoCompile *cfg, MonoMethod *cmethod, MonoMe
 			int addr_reg;
 
 			if (mini_is_gsharedvt_type (fsig->params [i])) {
-				MonoInst *is_deref;
-				int deref_arg_reg;
 				ins = mini_emit_get_gsharedvt_info_klass (cfg, mono_class_from_mono_type_internal (fsig->params [i]), MONO_RGCTX_INFO_CLASS_BOX_TYPE);
-				deref_arg_reg = alloc_preg (cfg);
-				/* deref_arg = BOX_TYPE != MONO_GSHAREDVT_BOX_TYPE_VTYPE */
-				EMIT_NEW_BIALU_IMM (cfg, is_deref, OP_ISUB_IMM, deref_arg_reg, ins->dreg, 1);
-				MONO_EMIT_NEW_STORE_MEMBASE (cfg, OP_STOREI1_MEMBASE_REG, is_gsharedvt_ins->dreg, i, is_deref->dreg);
+				MONO_EMIT_NEW_STORE_MEMBASE (cfg, OP_STOREI1_MEMBASE_REG, is_gsharedvt_ins->dreg, i, ins->dreg);
 			} else if (has_gsharedvt) {
 				MONO_EMIT_NEW_STORE_MEMBASE_IMM (cfg, OP_STOREI1_MEMBASE_IMM, is_gsharedvt_ins->dreg, i, 0);
 			}
@@ -5708,8 +5703,11 @@ check_get_virtual_method_assumptions (MonoClass* klass, MonoMethod* method)
  * Returns null, if the optimization cannot be performed.
  */
 static MonoMethod*
-try_prepare_objaddr_callvirt_optimization (MonoCompile *cfg, guchar *next_ip, guchar* end, MonoMethod *method, MonoGenericContext* generic_context, MonoClass *klass)
+try_prepare_objaddr_callvirt_optimization (MonoCompile *cfg, guchar *next_ip, guchar* end, MonoMethod *method, MonoGenericContext* generic_context, MonoType *param_type)
 {
+	g_assert(param_type);
+	MonoClass *klass = mono_class_from_mono_type_internal (param_type);
+
 	// TODO: relax the _is_def requirement?
 	if (cfg->compile_aot || cfg->compile_llvm || !klass || !mono_class_is_def (klass))
 		return NULL;
@@ -7134,7 +7132,7 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 			}
 			*sp++ = ins;
 			/*if (!m_method_is_icall (method)) */{
-				MonoMethod* callvirt_target = try_prepare_objaddr_callvirt_optimization (cfg, next_ip, end, method, generic_context, param_types [n]->data.klass);
+				MonoMethod* callvirt_target = try_prepare_objaddr_callvirt_optimization (cfg, next_ip, end, method, generic_context, param_types [n]);
 				if (callvirt_target)
 					cmethod_override = callvirt_target;
 			}
@@ -9707,12 +9705,11 @@ calli_end:
 			//   callvirt instance ISomeIface::Method()
 			// TO
 			//   call SomeStruct::Method()
-			guchar* callvirt_ip;
 			guint32 callvirt_proc_token;
 			if (!((cfg->compile_aot || cfg->compile_llvm) && !mono_class_is_def(klass)) && // we cannot devirtualize in AOT when using generics
 				next_ip < end &&
-				(callvirt_ip = il_read_callvirt (next_ip, end, &callvirt_proc_token)) && 
-				ip_in_bb (cfg, cfg->cbb, callvirt_ip) ) {
+				il_read_callvirt (next_ip, end, &callvirt_proc_token) &&
+				ip_in_bb (cfg, cfg->cbb, next_ip) ) {
 				MonoMethod* iface_method;
 				MonoMethodSignature* iface_method_sig;
 
@@ -11342,6 +11339,14 @@ mono_ldptr:
 
 			int dreg = alloc_preg (cfg);
 			EMIT_NEW_LOAD_MEMBASE (cfg, ins, OP_LOAD_MEMBASE, dreg, sp [0]->dreg, MONO_STRUCT_OFFSET (MonoDelegate, method_ptr));
+			*sp++ = ins;
+			break;
+		}
+		case MONO_CEE_MONO_LDVIRTFTN_DELEGATE: {
+			CHECK_STACK (2);
+			sp -= 2;
+
+			ins = mono_emit_jit_icall (cfg, mono_get_addr_compiled_method, sp);
 			*sp++ = ins;
 			break;
 		}

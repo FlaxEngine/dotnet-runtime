@@ -323,6 +323,7 @@ elseif(CLR_CMAKE_HOST_OS STREQUAL "windows")
     add_compile_options(/GL)   # whole program optimization
     add_link_options(/LTCG)    # link-time code generation
     add_link_options(/DEBUG)   # enable debugging information
+    add_link_options(/DEBUGTYPE:CV,FIXUP)   # enable fixup debug information
     add_link_options(/OPT:REF) # optimize: remove unreferenced functions & data
     add_link_options(/OPT:ICF) # optimize: enable COMDAT folding
     # the combination of /Zi compiler flag and /DEBUG /OPT:REF /OPT:ICF
@@ -614,6 +615,27 @@ if(GCC)
 
   if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(WARNINGS "${WARNINGS} -Qunused-arguments -Wno-tautological-compare -Wno-parentheses-equality -Wno-self-assign -Wno-return-stack-address -Wno-constant-logical-operand -Wno-zero-length-array -Wno-asm-operand-widths")
+  endif()
+
+  if (HOST_MACCAT)
+    # Somewhere between CMake 3.17 and 3.19.4, it became impossible to not pass
+    # a value for mmacosx-version-min (blank CMAKE_OSX_DEPLOYMENT_TARGET gets
+    # replaced with a default value, and always gets expanded to an OS version.
+    # https://gitlab.kitware.com/cmake/cmake/-/issues/20132
+    # We need to disable the warning that -target replaces -mmacosx-version-min
+    #
+    # With https://github.com/llvm/llvm-project/commit/1c66d08b0137cef7761b8220d3b7cb7833f57cdb clang renamed the option so we need to check for both
+    check_c_compiler_flag("-Wno-overriding-option" COMPILER_SUPPORTS_W_NO_OVERRIDING_OPTION)
+    if (COMPILER_SUPPORTS_W_NO_OVERRIDING_OPTION)
+      set(WARNINGS "${WARNINGS} -Wno-overriding-option")
+    else()
+      check_c_compiler_flag("-Wno-overriding-t-option" COMPILER_SUPPORTS_W_NO_OVERRIDING_T_OPTION)
+      if (COMPILER_SUPPORTS_W_NO_OVERRIDING_T_OPTION)
+        set(WARNINGS "${WARNINGS} -Wno-overriding-t-option")
+      else()
+        message(FATAL_ERROR "Compiler does not support -Wno-overriding-option or -Wno-overriding-t-option, needed for Mac Catalyst builds.")
+      endif()
+    endif()
   endif()
 
   check_c_compiler_flag("-Werror=incompatible-pointer-types" WERROR_INCOMPATIBLE_POINTER_TYPES)

@@ -20,20 +20,32 @@ jobs:
   - name: SignType
     value: $[ coalesce(variables.OfficialSignType, 'real') ]
 
+  templateContext:
+    outputs:
+    - output: pipelineArtifact
+      displayName: 'Publish BuildLogs'
+      condition: succeededOrFailed()
+      targetPath: '$(Build.StagingDirectory)\BuildLogs'
+      artifactName: ${{ parameters.logArtifactName }}
+
   steps:
   - checkout: self
     clean: true
     fetchDepth: 20
 
   - ${{ if eq(parameters.isOfficialBuild, true) }}:
-    - task: NuGetAuthenticate@0
+    - task: NuGetAuthenticate@1
 
-  - task: MicroBuildSigningPlugin@2
+  - task: MicroBuildSigningPlugin@4
     displayName: Install MicroBuild plugin for Signing
     inputs:
       signType: $(SignType)
       zipSources: false
       feedSource: https://dnceng.pkgs.visualstudio.com/_packaging/MicroBuildToolset/nuget/v3/index.json
+      ConnectedPMEServiceName: 248d384a-b39b-46e3-8ad5-c2c210d5e7ca
+    env:
+      TeamName: $(_TeamName)
+      MicroBuildOutputFolderOverride: '$(Agent.TempDirectory)'
     continueOnError: false
     condition: and(succeeded(),
                 in(variables['SignType'], 'real', 'test'))
@@ -56,6 +68,10 @@ jobs:
       /bl:$(Build.SourcesDirectory)\prepare-artifacts.binlog
     displayName: Prepare artifacts and upload to build
 
+  - template: /eng/common/templates-official/steps/generate-sbom.yml
+    parameters:
+      BuildDropPath: $(Build.SourcesDirectory)\artifacts
+
   - task: CopyFiles@2
     displayName: Copy Files to $(Build.StagingDirectory)\BuildLogs
     inputs:
@@ -65,11 +81,4 @@ jobs:
         **/*.binlog
       TargetFolder: '$(Build.StagingDirectory)\BuildLogs'
     continueOnError: true
-    condition: succeededOrFailed()
-
-  - task: PublishPipelineArtifact@1
-    displayName: Publish BuildLogs
-    inputs:
-      targetPath: '$(Build.StagingDirectory)\BuildLogs'
-      artifactName: ${{ parameters.logArtifactName }}
     condition: succeededOrFailed()

@@ -554,6 +554,16 @@ void Lowering::LowerBlockStore(GenTreeBlk* blkNode)
 
     if (blkNode->OperIsInitBlkOp())
     {
+#ifdef DEBUG
+        // Use BlkOpKindLoop for more cases under stress mode
+        if (comp->compStressCompile(Compiler::STRESS_STORE_BLOCK_UNROLLING, 50) && blkNode->OperIs(GT_STORE_BLK) &&
+            ((blkNode->GetLayout()->GetSize() % TARGET_POINTER_SIZE) == 0) && src->IsIntegralConst(0))
+        {
+            blkNode->gtBlkOpKind = GenTreeBlk::BlkOpKindLoop;
+            return;
+        }
+#endif
+
         if (src->OperIs(GT_INIT_VAL))
         {
             src->SetContained();
@@ -597,6 +607,15 @@ void Lowering::LowerBlockStore(GenTreeBlk* blkNode)
             src->AsIntCon()->SetIconValue(fill);
 
             ContainBlockStoreAddress(blkNode, size, dstAddr, nullptr);
+        }
+        else if (blkNode->IsZeroingGcPointersOnHeap())
+        {
+            blkNode->gtBlkOpKind = GenTreeBlk::BlkOpKindLoop;
+#ifdef TARGET_ARM64
+            // On ARM64 we can just use REG_ZR instead of having to load
+            // the constant into a real register like on ARM32.
+            src->SetContained();
+#endif
         }
         else
         {
@@ -2800,18 +2819,6 @@ void Lowering::ContainCheckHWIntrinsic(GenTreeHWIntrinsic* node)
                 if (intrin.op2->IsCnsIntOrI())
                 {
                     MakeSrcContained(node, intrin.op2);
-
-                    if ((intrin.op2->AsIntCon()->gtIconVal == 0) && intrin.op3->IsCnsFltOrDbl())
-                    {
-                        assert(varTypeIsFloating(intrin.baseType));
-
-                        const double dataValue = intrin.op3->AsDblCon()->DconValue();
-
-                        if (comp->GetEmitter()->emitIns_valid_imm_for_fmov(dataValue))
-                        {
-                            MakeSrcContained(node, intrin.op3);
-                        }
-                    }
                 }
                 break;
 

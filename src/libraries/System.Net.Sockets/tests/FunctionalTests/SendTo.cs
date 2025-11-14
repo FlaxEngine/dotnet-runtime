@@ -95,6 +95,7 @@ namespace System.Net.Sockets.Tests
 
         [Fact]
         [SkipOnPlatform(TestPlatforms.FreeBSD, "FreeBSD allows sendto() to broadcast")]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/114450", typeof(PlatformDetection), nameof(PlatformDetection.IsMacCatalyst), nameof(PlatformDetection.IsX64Process))]
         public async Task Datagram_UDP_AccessDenied_Throws_DoesNotBind()
         {
             IPEndPoint invalidEndpoint = new IPEndPoint(IPAddress.Broadcast, 1234);
@@ -173,6 +174,35 @@ namespace System.Net.Sockets.Tests
     public sealed class SendTo_Task : SendTo<SocketHelperTask>
     {
         public SendTo_Task(ITestOutputHelper output) : base(output) { }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task SendTo_DifferentEP_Success(bool ipv4)
+        {
+            IPAddress address = ipv4 ? IPAddress.Loopback : IPAddress.IPv6Loopback;
+            IPEndPoint remoteEp = new IPEndPoint(address, 0);
+
+            using Socket receiver1 = new Socket(address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            using Socket receiver2 = new Socket(address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            using Socket sender = new Socket(address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+
+            receiver1.BindToAnonymousPort(address);
+            receiver2.BindToAnonymousPort(address);
+
+            byte[] sendBuffer = new byte[32];
+            var receiveInternalBuffer = new byte[sendBuffer.Length];
+            ArraySegment<byte> receiveBuffer = new ArraySegment<byte>(receiveInternalBuffer, 0, receiveInternalBuffer.Length);
+
+
+            await sender.SendToAsync(sendBuffer, SocketFlags.None, receiver1.LocalEndPoint);
+            SocketReceiveFromResult result = await ReceiveFromAsync(receiver1, receiveBuffer, remoteEp).WaitAsync(TestSettings.PassingTestTimeout);
+            Assert.Equal(sendBuffer.Length, result.ReceivedBytes);
+
+            await sender.SendToAsync(sendBuffer, SocketFlags.None, receiver2.LocalEndPoint);
+            result = await ReceiveFromAsync(receiver2, receiveBuffer, remoteEp).WaitAsync(TestSettings.PassingTestTimeout);
+            Assert.Equal(sendBuffer.Length, result.ReceivedBytes);
+        }
     }
 
     public sealed class SendTo_CancellableTask : SendTo<SocketHelperCancellableTask>

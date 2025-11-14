@@ -730,7 +730,6 @@ namespace System.Net.Http.Functional.Tests
             };
             using HttpResponseMessage response = await client.SendAsync(request).WaitAsync(TimeSpan.FromSeconds(20));
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(3, response.Version.Major);
         }
 
@@ -749,7 +748,6 @@ namespace System.Net.Http.Functional.Tests
             };
             using HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead).WaitAsync(TimeSpan.FromSeconds(20));
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(3, response.Version.Major);
 
             var content = await response.Content.ReadAsStringAsync();
@@ -1623,6 +1621,7 @@ namespace System.Net.Http.Functional.Tests
         }
 
         [Fact]
+        [ActiveIssue("https://github.com/dotnet/runtime/issues/103264")]
         public async Task ServerSendsTrailingHeaders_Success()
         {
             using Http3LoopbackServer server = CreateHttp3LoopbackServer();

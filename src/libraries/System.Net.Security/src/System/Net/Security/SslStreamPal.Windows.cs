@@ -231,8 +231,7 @@ namespace System.Net.Security
                 if (newCredentialsRequested && sslAuthenticationOptions.CertificateContext != null)
                 {
                     SafeFreeCredential_SECURITY handle = (SafeFreeCredential_SECURITY)cred;
-                    // We need to create copy to avoid Disposal issue.
-                    handle.LocalCertificate = new X509Certificate2(sslAuthenticationOptions.CertificateContext.TargetCertificate);
+                    handle.HasLocalCertificate = true;
                 }
 
                 return cred;
@@ -356,11 +355,9 @@ namespace System.Net.Security
             if (isServer)
             {
                 direction = Interop.SspiCli.CredentialUse.SECPKG_CRED_INBOUND;
-                flags = Interop.SspiCli.SCH_CREDENTIALS.Flags.SCH_SEND_AUX_RECORD;
-                if (authOptions.CertificateContext?.Trust?._sendTrustInHandshake == true)
-                {
-                    flags |= Interop.SspiCli.SCH_CREDENTIALS.Flags.SCH_CRED_NO_SYSTEM_MAPPER;
-                }
+                flags =
+                    Interop.SspiCli.SCH_CREDENTIALS.Flags.SCH_SEND_AUX_RECORD |
+                    Interop.SspiCli.SCH_CREDENTIALS.Flags.SCH_CRED_NO_SYSTEM_MAPPER;
                 if (!authOptions.AllowTlsResume)
                 {
                     // Works only on server

@@ -504,11 +504,11 @@ struct _MonoGenericContainer {
 	int type_argc    : 29; // Per the ECMA spec, this value is capped at 16 bits
 	/* If true, we're a generic method, otherwise a generic type definition. */
 	/* Invariant: parent != NULL => is_method */
-	gint is_method     : 1;
+	guint is_method     : 1;
 	/* If true, this container has no associated class/method and only the image is known. This can happen:
 	   1. For the special anonymous containers kept by MonoImage.
 	   2. When user code creates a generic parameter via SRE, but has not yet set an owner. */
-	gint is_anonymous : 1;
+	guint is_anonymous : 1;
 	/* Our type parameters. If this is a special anonymous container (case 1, above), this field is not valid, use mono_metadata_create_anon_gparam ()  */
 	MonoGenericParamFull *type_params;
 };
@@ -957,25 +957,20 @@ mono_class_get_##shortname##_class (void)	\
 
 // GENERATE_TRY_GET_CLASS_WITH_CACHE attempts mono_class_load_from_name approximately
 // only once. i.e. if it fails, it will return null and not retry.
-// In a race it might try a few times, but not indefinitely.
-//
-// FIXME This maybe has excessive volatile/barriers.
-//
 #define GENERATE_TRY_GET_CLASS_WITH_CACHE(shortname,name_space,name) \
 MonoClass*	\
 mono_class_try_get_##shortname##_class (void)	\
 {	\
-	static volatile MonoClass *tmp_class;	\
-	static volatile gboolean inited;	\
-	MonoClass *klass = (MonoClass *)tmp_class;	\
-	mono_memory_barrier ();	\
-	if (!inited) {	\
-		klass = mono_class_try_load_from_name (mono_class_generate_get_corlib_impl (), name_space, name);	\
-		tmp_class = klass;	\
-		mono_memory_barrier ();	\
-		inited = TRUE;	\
+	static MonoClass *cached_class;	\
+	static gboolean cached_class_inited;	\
+	gboolean tmp_inited;	\
+	mono_atomic_load_acquire(tmp_inited, gboolean, &cached_class_inited);	\
+	if (G_LIKELY(tmp_inited)) {	\
+		return (MonoClass*)cached_class;	\
 	}	\
-	return klass;	\
+	cached_class = mono_class_try_load_from_name (mono_class_generate_get_corlib_impl (), name_space, name);	\
+	mono_atomic_store_release(&cached_class_inited, TRUE); \
+	return (MonoClass*)cached_class;	\
 }
 
 GENERATE_TRY_GET_CLASS_WITH_CACHE_DECL (safehandle)
@@ -1450,7 +1445,7 @@ mono_class_get_object_finalize_slot (void);
 MonoMethod *
 mono_class_get_default_finalize_method (void);
 
-const char *
+MONO_COMPONENT_API const char *
 mono_field_get_rva (MonoClassField *field, int swizzle);
 
 MONO_COMPONENT_API void

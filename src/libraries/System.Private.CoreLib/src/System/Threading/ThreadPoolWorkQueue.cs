@@ -381,6 +381,17 @@ namespace System.Threading
             }
         }
 
+#if CORECLR
+        // This config var can be used to enable an experimental mode that may reduce the effects of some priority inversion
+        // issues seen in cases involving a lot of sync-over-async. See EnqueueForPrioritizationExperiment() for more
+        // information. The mode is experimental and may change in the future.
+        internal static readonly bool s_prioritizationExperiment =
+            AppContextConfigHelper.GetBooleanConfig(
+                "System.Threading.ThreadPool.PrioritizationExperiment",
+                "DOTNET_ThreadPool_PrioritizationExperiment",
+                defaultValue: false);
+#endif
+
         private const int ProcessorsPerAssignableWorkItemQueue = 16;
         private static readonly int s_assignableWorkItemQueueCount =
             Environment.ProcessorCount <= 32 ? 0 :
@@ -393,6 +404,11 @@ namespace System.Threading
         // SOS's ThreadPool command depends on the following names
         internal readonly ConcurrentQueue<object> workItems = new ConcurrentQueue<object>();
         internal readonly ConcurrentQueue<object> highPriorityWorkItems = new ConcurrentQueue<object>();
+
+#if CORECLR
+        internal readonly ConcurrentQueue<object> lowPriorityWorkItems =
+            s_prioritizationExperiment ? new ConcurrentQueue<object>() : null!;
+#endif
 
         // SOS's ThreadPool command depends on the following name. The global queue doesn't scale well beyond a point of
         // concurrency. Some additional queues may be added and assigned to a limited number of worker threads if necessary to
@@ -598,22 +614,67 @@ namespace System.Threading
             if (_loggingEnabled && FrameworkEventSource.Log.IsEnabled())
                 FrameworkEventSource.Log.ThreadPoolEnqueueWorkObject(callback);
 
-            ThreadPoolWorkQueueThreadLocals? tl;
-            if (!forceGlobal && (tl = ThreadPoolWorkQueueThreadLocals.threadLocals) != null)
+#if CORECLR
+            if (s_prioritizationExperiment)
             {
-                tl.workStealingQueue.LocalPush(callback);
+                EnqueueForPrioritizationExperiment(callback, forceGlobal);
             }
             else
+#endif
             {
-                ConcurrentQueue<object> queue =
-                    s_assignableWorkItemQueueCount > 0 && (tl = ThreadPoolWorkQueueThreadLocals.threadLocals) != null
-                        ? tl.assignedGlobalWorkItemQueue
-                        : workItems;
-                queue.Enqueue(callback);
+                ThreadPoolWorkQueueThreadLocals? tl;
+                if (!forceGlobal && (tl = ThreadPoolWorkQueueThreadLocals.threadLocals) != null)
+                {
+                    tl.workStealingQueue.LocalPush(callback);
+                }
+                else
+                {
+                    ConcurrentQueue<object> queue =
+                        s_assignableWorkItemQueueCount > 0 && (tl = ThreadPoolWorkQueueThreadLocals.threadLocals) != null
+                            ? tl.assignedGlobalWorkItemQueue
+                            : workItems;
+                    queue.Enqueue(callback);
+                }
             }
 
             EnsureThreadRequested();
         }
+
+#if CORECLR
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void EnqueueForPrioritizationExperiment(object callback, bool forceGlobal)
+        {
+            ThreadPoolWorkQueueThreadLocals? tl = ThreadPoolWorkQueueThreadLocals.threadLocals;
+            if (!forceGlobal && tl != null)
+            {
+                tl.workStealingQueue.LocalPush(callback);
+                return;
+            }
+
+            ConcurrentQueue<object> queue;
+
+            // This is a rough and experimental attempt at identifying work items that should be lower priority than other
+            // global work items (even ones that haven't been queued yet), and to queue them to a low-priority global queue that
+            // is checked after all other global queues. In some cases, a work item may queue another work item that is part of
+            // the same set of work. For global work items, the second work item would typically get queued behind other global
+            // work items. In some cases involving a lot of sync-over-async, that can significantly delay worker threads from
+            // getting unblocked.
+            if (tl == null && callback is QueueUserWorkItemCallbackBase)
+            {
+                queue = lowPriorityWorkItems;
+            }
+            else if (s_assignableWorkItemQueueCount > 0 && tl != null)
+            {
+                queue = tl.assignedGlobalWorkItemQueue;
+            }
+            else
+            {
+                queue = workItems;
+            }
+
+            queue.Enqueue(callback);
+        }
+#endif
 
         public void EnqueueAtHighPriority(object workItem)
         {
@@ -628,6 +689,27 @@ namespace System.Threading
             Volatile.Write(ref _mayHaveHighPriorityWorkItems, 1);
 
             EnsureThreadRequested();
+        }
+
+        internal static void TransferAllLocalWorkItemsToHighPriorityGlobalQueue()
+        {
+            // If there's no local queue, there's nothing to transfer.
+            if (ThreadPoolWorkQueueThreadLocals.threadLocals is not ThreadPoolWorkQueueThreadLocals tl)
+            {
+                return;
+            }
+
+            // Pop each work item off the local queue and push it onto the global. This is a
+            // bounded loop as no other thread is allowed to push into this thread's queue.
+            ThreadPoolWorkQueue queue = ThreadPool.s_workQueue;
+            while (tl.workStealingQueue.LocalPop() is object workItem)
+            {
+                queue.highPriorityWorkItems.Enqueue(workItem);
+            }
+
+            Volatile.Write(ref queue._mayHaveHighPriorityWorkItems, 1);
+
+            queue.EnsureThreadRequested();
         }
 
         internal static bool LocalFindAndPop(object callback)
@@ -691,6 +773,14 @@ namespace System.Threading
                 }
             }
 
+#if CORECLR
+            // Check for low-priority work items
+            if (s_prioritizationExperiment && lowPriorityWorkItems.TryDequeue(out workItem))
+            {
+                return workItem;
+            }
+#endif
+
             // Try to steal from other threads' local work items
             {
                 WorkStealingQueue localWsq = tl.workStealingQueue;
@@ -750,6 +840,13 @@ namespace System.Threading
             get
             {
                 long count = (long)highPriorityWorkItems.Count + workItems.Count;
+#if CORECLR
+                if (s_prioritizationExperiment)
+                {
+                    count += lowPriorityWorkItems.Count;
+                }
+#endif
+
                 for (int i = 0; i < s_assignableWorkItemQueueCount; i++)
                 {
                     count += _assignableWorkItemQueues[i].Count;
@@ -1107,6 +1204,9 @@ namespace System.Threading
             Interlocked.MemoryBarrier();
             if (!_workItems.TryDequeue(out T workItem))
             {
+                // Discount a work item here to avoid counting this queue processing work item
+                ThreadInt64PersistentCounter.Decrement(
+                    ThreadPoolWorkQueueThreadLocals.threadLocals!.threadLocalCompletionCountObject!);
                 return;
             }
 
@@ -1150,7 +1250,11 @@ namespace System.Threading
                 currentThread.ResetThreadPoolThread();
             }
 
-            ThreadInt64PersistentCounter.Add(tl.threadLocalCompletionCountObject!, completedCount);
+            // Discount a work item here to avoid counting this queue processing work item
+            if (completedCount > 1)
+            {
+                ThreadInt64PersistentCounter.Add(tl.threadLocalCompletionCountObject!, completedCount - 1);
+            }
         }
     }
 
@@ -1638,6 +1742,17 @@ namespace System.Threading
             {
                 yield return workItem;
             }
+
+#if CORECLR
+            if (ThreadPoolWorkQueue.s_prioritizationExperiment)
+            {
+                // Enumerate low-priority global queue
+                foreach (object workItem in s_workQueue.lowPriorityWorkItems)
+                {
+                    yield return workItem;
+                }
+            }
+#endif
 
             // Enumerate each local queue
             foreach (ThreadPoolWorkQueue.WorkStealingQueue wsq in ThreadPoolWorkQueue.WorkStealingQueueList.Queues)

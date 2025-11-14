@@ -392,6 +392,12 @@ BOOL g_singleVersionHosting;
 typedef BOOL(WINAPI* PINITIALIZECONTEXT2)(PVOID Buffer, DWORD ContextFlags, PCONTEXT* Context, PDWORD ContextLength, ULONG64 XStateCompactionMask);
 PINITIALIZECONTEXT2 g_pfnInitializeContext2 = NULL;
 
+static BOOLEAN WINAPI RtlDllShutdownInProgressFallback()
+{
+    return g_fProcessDetach;
+}
+PRTLDLLSHUTDOWNINPROGRESS g_pfnRtlDllShutdownInProgress = &RtlDllShutdownInProgressFallback;
+
 #ifdef TARGET_X86
 typedef VOID(__cdecl* PRTLRESTORECONTEXT)(PCONTEXT ContextRecord, struct _EXCEPTION_RECORD* ExceptionRecord);
 PRTLRESTORECONTEXT g_pfnRtlRestoreContext = NULL;
@@ -402,8 +408,12 @@ void InitializeOptionalWindowsAPIPointers()
     HMODULE hm = GetModuleHandleW(_T("kernel32.dll"));
     g_pfnInitializeContext2 = (PINITIALIZECONTEXT2)GetProcAddress(hm, "InitializeContext2");
 
-#ifdef TARGET_X86
     hm = GetModuleHandleW(_T("ntdll.dll"));
+    PRTLDLLSHUTDOWNINPROGRESS pfn = (PRTLDLLSHUTDOWNINPROGRESS)GetProcAddress(hm, "RtlDllShutdownInProgress");
+    if (pfn != NULL)
+        g_pfnRtlDllShutdownInProgress = pfn;
+
+#ifdef TARGET_X86
     g_pfnRtlRestoreContext = (PRTLRESTORECONTEXT)GetProcAddress(hm, "RtlRestoreContext");
 #endif //TARGET_X86
 }
@@ -544,7 +554,11 @@ void EESocketCleanupHelper(bool isExecutingOnAltStack)
 
     if (isExecutingOnAltStack)
     {
-        GetThread()->SetExecutingOnAltStack();
+        Thread *pThread = GetThreadNULLOk();
+        if (pThread)
+        {
+             pThread->SetExecutingOnAltStack();
+        }
     }
 
     // Close the debugger transport socket first
@@ -1331,9 +1345,6 @@ part2:
                 // Shutdown finalizer before we suspend all background threads. Otherwise we
                 // never get to finalize anything.
 
-                // No longer process exceptions
-                g_fNoExceptions = true;
-
                 // <TODO>@TODO: This does things which shouldn't occur in part 2.  Namely,
                 // calling managed dll main callbacks (AppDomain::SignalProcessDetach), and
                 // RemoveAppDomainFromIPC.
@@ -1752,9 +1763,9 @@ struct TlsDestructionMonitor
                     GCX_COOP_NO_DTOR_END();
                 }
                 thread->DetachThread(TRUE);
-                DeleteThreadLocalMemory();
             }
 
+            DeleteThreadLocalMemory();
             ThreadDetaching();
         }
     }
@@ -1786,16 +1797,11 @@ void DeleteThreadLocalMemory()
     t_ThreadStatics.NonGCMaxThreadStaticBlocks = 0;
     t_ThreadStatics.GCMaxThreadStaticBlocks = 0;
 
-    if (t_ThreadStatics.NonGCThreadStaticBlocks != nullptr)
-    {
-        delete[] t_ThreadStatics.NonGCThreadStaticBlocks;
-        t_ThreadStatics.NonGCThreadStaticBlocks = nullptr;
-    }
-    if (t_ThreadStatics.GCThreadStaticBlocks != nullptr)
-    {
-        delete[] t_ThreadStatics.GCThreadStaticBlocks;
-        t_ThreadStatics.GCThreadStaticBlocks = nullptr;
-    }
+    delete[] t_ThreadStatics.NonGCThreadStaticBlocks;
+    t_ThreadStatics.NonGCThreadStaticBlocks = nullptr;
+
+    delete[] t_ThreadStatics.GCThreadStaticBlocks;
+    t_ThreadStatics.GCThreadStaticBlocks = nullptr;
 }
 
 #ifdef DEBUGGING_SUPPORTED

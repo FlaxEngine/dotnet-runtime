@@ -334,6 +334,7 @@ namespace pal
 
     bool get_default_breadcrumb_store(string_t* recv);
     bool is_path_rooted(const string_t& path);
+    bool is_path_fully_qualified(const string_t& path);
 
 #if !defined(TARGET_PS4) && !defined(TARGET_PS5) && !defined(TARGET_SWITCH)
     // Returns a platform-specific, user-private directory

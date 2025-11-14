@@ -64,7 +64,7 @@
 
     <Copy SourceFiles="@(_IcuArtifacts)" DestinationFolder="$([MSBuild]::NormalizeDirectory('$(ArtifactsBinDir)', 'native', '$(_BuildNativeOutConfig)'))" SkipUnchangedFiles="true" />
     <Message Text="$(MSBuildThisFileDirectory)build-native.sh $(_BuildNativeUnixArgs)" Importance="High"/>
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.sh&quot; $(_BuildNativeUnixArgs)" />
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.sh&quot; $(_BuildNativeUnixArgs)" IgnoreStandardErrorWarningFormat="true" />
   </Target>
 
   <Target Name="BuildNativeWindows"
@@ -78,7 +78,7 @@
     </PropertyGroup>
     <!-- Run script that uses CMake to generate and build the native files. -->
     <Message Text="[build-native.proj] &quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)$(_CMakeArgs)" Importance="High"/>
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)$(_CMakeArgs)" />
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)build-native.cmd&quot; $(_BuildNativeArgs)$(_CMakeArgs)" IgnoreStandardErrorWarningFormat="true" />
   </Target>
 
   <UsingTask TaskName="AndroidLibBuilderTask"

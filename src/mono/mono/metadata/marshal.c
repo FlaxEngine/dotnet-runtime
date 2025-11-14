@@ -1061,7 +1061,7 @@ mono_string_builder_to_utf16_impl (MonoStringBuilderHandle sb, MonoError *error)
 	return str;
 }
 
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 
 /* This is a JIT icall, it sets the pending exception (in wrapper) and returns NULL on error. */
 gpointer
@@ -5183,7 +5183,7 @@ mono_marshal_get_unsafe_accessor_wrapper (MonoMethod *accessor_method, MonoUnsaf
 	return res;
 }
 
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 
 static void*
 mono_marshal_alloc_co_task_mem (size_t size)
@@ -5229,7 +5229,7 @@ ves_icall_marshal_alloc_impl (gsize size, MonoError *error)
 	return mono_marshal_alloc (size, error);
 }
 
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 
 static void
 mono_marshal_free_co_task_mem (void *ptr)

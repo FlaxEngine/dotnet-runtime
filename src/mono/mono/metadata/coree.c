@@ -166,7 +166,9 @@ __int32 STDMETHODCALLTYPE _CorExeMain(void)
 	if (corlib_version_error) {
 		g_free (corlib_version_error);
 		g_free (file_name);
+#if !_GAMING_XBOX
 		MessageBox (NULL, L"Corlib not in sync with this runtime.", NULL, MB_ICONERROR);
+#endif
 		mono_runtime_quit_internal ();
 		ExitProcess (1);
 	}
@@ -176,7 +178,9 @@ __int32 STDMETHODCALLTYPE _CorExeMain(void)
 	assembly = mono_assembly_request_open (file_name, &req, NULL);
 	if (!assembly) {
 		g_free (file_name);
+#if !_GAMING_XBOX
 		MessageBox (NULL, L"Cannot open assembly.", NULL, MB_ICONERROR);
+#endif
 		mono_runtime_quit_internal ();
 		ExitProcess (1);
 	}
@@ -185,7 +189,9 @@ __int32 STDMETHODCALLTYPE _CorExeMain(void)
 	entry = mono_image_get_entry_point (image);
 	if (!entry) {
 		g_free (file_name);
+#if !_GAMING_XBOX
 		MessageBox (NULL, L"Assembly doesn't have an entry point.", NULL, MB_ICONERROR);
+#endif
 		mono_runtime_quit_internal ();
 		ExitProcess (1);
 	}
@@ -194,12 +200,19 @@ __int32 STDMETHODCALLTYPE _CorExeMain(void)
 	if (method == NULL) {
 		g_free (file_name);
 		mono_error_cleanup (error); /* FIXME don't swallow the error */
+#if !_GAMING_XBOX
 		MessageBox (NULL, L"The entry point method could not be loaded.", NULL, MB_ICONERROR);
+#endif
 		mono_runtime_quit_internal ();
 		ExitProcess (1);
 	}
 
+#if _GAMING_XBOX
+	argc = 1;
+	argvw = NULL;
+#else
 	argvw = CommandLineToArgvW (GetCommandLine (), &argc);
+#endif
 	argv = g_new0 (gchar*, argc);
 	argv [0] = file_name;
 	for (i = 1; i < argc; ++i)

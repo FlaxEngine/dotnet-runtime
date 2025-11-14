@@ -330,6 +330,7 @@ namespace
                 return;
         }
 
+#if !_GAMING_XBOX
         pal::string_t dialog_message(instruction);
         dialog_message.append(_X("\n\n"));
         dialog_message.append(details);
@@ -339,6 +340,7 @@ namespace
         {
             open_url(url.c_str());
         }
+#endif
     }
 }
 

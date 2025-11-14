@@ -3902,7 +3902,7 @@ mono_set_pending_exception_handle (MonoExceptionHandle exc)
 void
 mono_thread_init_apartment_state (void)
 {
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 	MonoInternalThread* thread = mono_thread_internal_current ();
 
 	/* Positive return value indicates success, either
@@ -3922,7 +3922,7 @@ mono_thread_init_apartment_state (void)
 void
 mono_thread_cleanup_apartment_state (void)
 {
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 	MonoInternalThread* thread = mono_thread_internal_current ();
 	if (thread && thread->apartment_state != ThreadApartmentState_Unknown) {
 		CoUninitialize ();

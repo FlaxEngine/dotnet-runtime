@@ -3161,7 +3161,12 @@ mono_win32_parse_options (const char *options, int *ref_argc, char **ref_argv []
 			}
 		}
 
+#if _GAMING_XBOX
+		argc = 0;
+		argv = NULL;
+#else
 		argv = CommandLineToArgvW (optionsw, &argc);
+#endif
 		if (argv) {
 			for (int i = 0; i < argc; i++)
 				g_ptr_array_add (array, g_utf16_to_utf8 (argv[i], -1, NULL, NULL, NULL));

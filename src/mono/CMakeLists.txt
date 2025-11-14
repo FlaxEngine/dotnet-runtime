@@ -316,7 +316,17 @@ elseif(CLR_CMAKE_HOST_OS STREQUAL "windows")
   add_compile_options(/EHsc) # set exception handling behavior
   add_compile_options(/FC)   # use full pathnames in diagnostics
   add_link_options(/STACK:0x800000)  # set stack size to 8MB (default is 1MB)
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  if(_GAMING_XBOX)
+    add_definitions(-DNO_GLOBALIZATION_SHIM)
+    add_compile_options(/Oi)   # enable intrinsics
+    add_compile_options(/GF)   # enable string pooling
+    add_compile_options(/Zi)   # enable debugging information
+    add_link_options(/LTCG)    # link-time code generation
+    add_link_options(/DEBUG)   # enable debugging information
+    add_link_options(/DEBUGTYPE:CV,FIXUP)   # enable fixup debug information
+    add_link_options(/OPT:REF) # optimize: remove unreferenced functions & data
+    add_link_options(/OPT:ICF) # optimize: enable COMDAT folding
+  elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(/Oi)   # enable intrinsics
     add_compile_options(/GF)   # enable string pooling
     add_compile_options(/Zi)   # enable debugging information

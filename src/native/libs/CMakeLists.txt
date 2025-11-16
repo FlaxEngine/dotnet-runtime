@@ -10,6 +10,10 @@ elseif(TARGET_SYSTEM_NAME STREQUAL "ps5")
 elseif(TARGET_SYSTEM_NAME STREQUAL "switch")
   message("Build libs/CMakeLists.txt for Switch")
   include(../../switch/SwitchToolchain.cmake)
+elseif(_GAMING_XBOX OR $ENV{_GAMING_XBOX})
+  message("Build libs/CMakeLists.txt for Xbox")
+  set(_GAMING_XBOX ON)
+  set(STATIC_LIBS_ONLY ON)
 endif()
 
 include(CheckCCompilerFlag)
@@ -28,6 +32,10 @@ include(${CLR_ENG_NATIVE_DIR}/configurecompiler.cmake)
 include_directories(${CLR_SRC_NATIVE_DIR})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+if(_GAMING_XBOX)
+  enable_language(CXX)
+endif()
 
 if (STATIC_LIBS_ONLY)
     # Suppress exporting of the PAL APIs

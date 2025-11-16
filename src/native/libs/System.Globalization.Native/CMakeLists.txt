@@ -173,7 +173,9 @@ if(NOT CLR_CMAKE_TARGET_APPLE AND NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE
 endif()
 
 if(CLR_CMAKE_TARGET_WIN32)
-    if(STATIC_LIBS_ONLY)
+    if(_GAMING_XBOX)
+        target_compile_options(System.Globalization.Native-Static PRIVATE /GL-)
+    elseif(STATIC_LIBS_ONLY)
         add_library(System.Globalization.Native.Aot
             STATIC
             ${NATIVEGLOBALIZATION_SOURCES}

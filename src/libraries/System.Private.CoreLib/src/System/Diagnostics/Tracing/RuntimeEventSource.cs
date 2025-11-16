@@ -23,6 +23,7 @@ namespace System.Diagnostics.Tracing
         }
 
         private static RuntimeEventSource? s_RuntimeEventSource;
+#if FEATURE_ETW
         private PollingCounter? _gcHeapSizeCounter;
         private IncrementingPollingCounter? _gen0GCCounter;
         private IncrementingPollingCounter? _gen1GCCounter;
@@ -50,6 +51,7 @@ namespace System.Diagnostics.Tracing
         private PollingCounter? _ilBytesJittedCounter;
         private PollingCounter? _methodsJittedCounter;
         private IncrementingPollingCounter? _jitTimeCounter;
+#endif
 
 #if NATIVEAOT
         // If EventSource feature is enabled, RuntimeEventSource needs to be initialized for NativeAOT
@@ -90,6 +92,7 @@ namespace System.Diagnostics.Tracing
 
         protected override void OnEventCommand(EventCommandEventArgs command)
         {
+#if FEATURE_ETW
             if (command.Command == EventCommand.Enable)
             {
                 // NOTE: These counters will NOT be disposed on disable command because we may be introducing
@@ -133,7 +136,7 @@ namespace System.Diagnostics.Tracing
                 AppContext.LogSwitchValues(this);
                 ProcessorCount(Environment.ProcessorCount);
             }
-
+#endif
         }
     }
 }

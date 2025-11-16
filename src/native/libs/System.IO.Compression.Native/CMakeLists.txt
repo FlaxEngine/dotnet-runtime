@@ -131,7 +131,7 @@ else ()
         ${NATIVECOMPRESSION_SOURCES}
     )
 
-    if(STATIC_LIBS_ONLY)
+    if(STATIC_LIBS_ONLY AND NOT _GAMING_XBOX)
         add_library(System.IO.Compression.Native.Aot
             STATIC
             ${NATIVECOMPRESSION_SOURCES}
@@ -158,7 +158,7 @@ else ()
         install (FILES $<TARGET_PDB_FILE:System.IO.Compression.Native> DESTINATION .)
     endif ()
 
-    if(STATIC_LIBS_ONLY)
+    if(STATIC_LIBS_ONLY AND NOT _GAMING_XBOX)
         install_static_library(System.IO.Compression.Native.Aot aotsdk nativeaot)
         install_static_library(System.IO.Compression.Native.Aot.GuardCF aotsdk nativeaot)
     endif()

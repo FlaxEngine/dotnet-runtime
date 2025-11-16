@@ -30,6 +30,14 @@ elseif(TARGET_SYSTEM_NAME STREQUAL "switch")
   set(DISABLE_EVENTPIPE 1)
   set(DISABLE_REFLECTION_EMIT 1)
   set(DISABLE_LOGGING 1)
+elseif(_GAMING_XBOX)
+  message("Build mono/CMakeLists.txt for Xbox")
+  set(DISABLE_SHARED_LIBS 1)
+  set(DISABLE_EXECUTABLES 1)
+  set(DISABLE_JIT 1)
+  set(DISABLE_EVENTPIPE 1)
+  set(DISABLE_REFLECTION_EMIT 1)
+  set(DISABLE_LOGGING 1)
 endif()
 
 project(mono)
@@ -317,7 +325,6 @@ elseif(CLR_CMAKE_HOST_OS STREQUAL "windows")
   add_compile_options(/FC)   # use full pathnames in diagnostics
   add_link_options(/STACK:0x800000)  # set stack size to 8MB (default is 1MB)
   if(_GAMING_XBOX)
-    add_definitions(-DNO_GLOBALIZATION_SHIM)
     add_compile_options(/Oi)   # enable intrinsics
     add_compile_options(/GF)   # enable string pooling
     add_compile_options(/Zi)   # enable debugging information

@@ -76,6 +76,7 @@ namespace System.Diagnostics.Tracing
             CooperativeBlocking,
         }
 
+#if FEATURE_ETW
         [Event(90, Level = EventLevel.Informational, Message = Messages.ContentionLockCreated, Task = Tasks.Contention, Opcode = EventOpcode.Info, Version = 0, Keywords = Keywords.ContentionKeyword)]
         private void ContentionLockCreated(nint LockID, nint AssociatedObjectID, ushort ClrInstanceID = DefaultClrInstanceId)
         {
@@ -321,5 +322,163 @@ namespace System.Diagnostics.Tracing
                 LogThreadPoolMinMaxThreads(MinWorkerThreads, MaxWorkerThreads, MinIOCompletionThreads, MaxIOCompletionThreads, ClrInstanceID);
             }
         }
+#else
+#pragma warning disable IDE0060 // Remove unused parameter
+        [Event(90, Level = EventLevel.Informational, Message = Messages.ContentionLockCreated, Task = Tasks.Contention, Opcode = EventOpcode.Info, Version = 0, Keywords = Keywords.ContentionKeyword)]
+        private void ContentionLockCreated(nint LockID, nint AssociatedObjectID, ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(81, Level = EventLevel.Informational, Message = Messages.ContentionStart, Task = Tasks.Contention, Opcode = EventOpcode.Start, Version = 2, Keywords = Keywords.ContentionKeyword)]
+        private void ContentionStart(
+            ContentionFlagsMap ContentionFlags,
+            ushort ClrInstanceID,
+            nint LockID,
+            nint AssociatedObjectID,
+            ulong LockOwnerThreadID)
+        {
+        }
+
+        [Event(91, Level = EventLevel.Informational, Message = Messages.ContentionStop, Task = Tasks.Contention, Opcode = EventOpcode.Stop, Version = 1, Keywords = Keywords.ContentionKeyword)]
+        private void ContentionStop(ContentionFlagsMap ContentionFlags, ushort ClrInstanceID, double DurationNs)
+        {
+        }
+
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ContentionStop(double durationNs) =>
+            ContentionStop(ContentionFlagsMap.Managed, DefaultClrInstanceId, durationNs);
+
+        [Event(50, Level = EventLevel.Informational, Message = Messages.WorkerThread, Task = Tasks.ThreadPoolWorkerThread, Opcode = EventOpcode.Start, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolWorkerThreadStart(
+            uint ActiveWorkerThreadCount,
+            uint RetiredWorkerThreadCount = 0,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(51, Level = EventLevel.Informational, Message = Messages.WorkerThread, Task = Tasks.ThreadPoolWorkerThread, Opcode = EventOpcode.Stop, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public void ThreadPoolWorkerThreadStop(
+            uint ActiveWorkerThreadCount,
+            uint RetiredWorkerThreadCount = 0,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(57, Level = EventLevel.Informational, Message = Messages.WorkerThread, Task = Tasks.ThreadPoolWorkerThread, Opcode = Opcodes.Wait, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ThreadPoolWorkerThreadWait(
+            uint ActiveWorkerThreadCount,
+            uint RetiredWorkerThreadCount = 0,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(54, Level = EventLevel.Informational, Message = Messages.WorkerThreadAdjustmentSample, Task = Tasks.ThreadPoolWorkerThreadAdjustment, Opcode = Opcodes.Sample, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolWorkerThreadAdjustmentSample(
+            double Throughput,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(55, Level = EventLevel.Informational, Message = Messages.WorkerThreadAdjustmentAdjustment, Task = Tasks.ThreadPoolWorkerThreadAdjustment, Opcode = Opcodes.Adjustment, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolWorkerThreadAdjustmentAdjustment(
+            double AverageThroughput,
+            uint NewWorkerThreadCount,
+            ThreadAdjustmentReasonMap Reason,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(56, Level = EventLevel.Verbose, Message = Messages.WorkerThreadAdjustmentStats, Task = Tasks.ThreadPoolWorkerThreadAdjustment, Opcode = Opcodes.Stats, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolWorkerThreadAdjustmentStats(
+            double Duration,
+            double Throughput,
+            double ThreadWave,
+            double ThroughputWave,
+            double ThroughputErrorEstimate,
+            double AverageThroughputErrorEstimate,
+            double ThroughputRatio,
+            double Confidence,
+            double NewControlSetting,
+            ushort NewThreadWaveMagnitude,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(63, Level = EventLevel.Verbose, Message = Messages.IOEnqueue, Task = Tasks.ThreadPool, Opcode = Opcodes.IOEnqueue, Version = 0, Keywords = Keywords.ThreadingKeyword | Keywords.ThreadTransferKeyword)]
+        private unsafe void ThreadPoolIOEnqueue(
+            IntPtr NativeOverlapped,
+            IntPtr Overlapped, // 0 if the Windows thread pool is used, the relevant info could be obtained from the NativeOverlapped* if necessary
+            bool MultiDequeues,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public unsafe void ThreadPoolIOEnqueue(NativeOverlapped* nativeOverlapped)
+        {
+        }
+
+        // TODO: This event is fired for minor compat with CoreCLR in this case. Consider removing this method and use
+        // FrameworkEventSource's thread transfer send/receive events instead at callers.
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ThreadPoolIOEnqueue(RegisteredWaitHandle registeredWaitHandle)
+        {
+        }
+
+        [Event(64, Level = EventLevel.Verbose, Message = Messages.IO, Task = Tasks.ThreadPool, Opcode = Opcodes.IODequeue, Version = 0, Keywords = Keywords.ThreadingKeyword | Keywords.ThreadTransferKeyword)]
+        private unsafe void ThreadPoolIODequeue(
+            IntPtr NativeOverlapped,
+            IntPtr Overlapped, // 0 if the Windows thread pool is used, the relevant info could be obtained from the NativeOverlapped* if necessary
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public unsafe void ThreadPoolIODequeue(NativeOverlapped* nativeOverlapped)
+        {
+        }
+
+        // TODO: This event is fired for minor compat with CoreCLR in this case. Consider removing this method and use
+        // FrameworkEventSource's thread transfer send/receive events instead at callers.
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ThreadPoolIODequeue(RegisteredWaitHandle registeredWaitHandle)
+        {
+        }
+
+        [Event(60, Level = EventLevel.Verbose, Message = Messages.WorkingThreadCount, Task = Tasks.ThreadPoolWorkingThreadCount, Opcode = EventOpcode.Start, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolWorkingThreadCount(uint Count, ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [NonEvent]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public unsafe void ThreadPoolIOPack(NativeOverlapped* nativeOverlapped)
+        {
+        }
+
+        [Event(65, Level = EventLevel.Verbose, Message = Messages.IO, Task = Tasks.ThreadPool, Opcode = Opcodes.IOPack, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        private unsafe void ThreadPoolIOPack(
+            IntPtr NativeOverlapped,
+            IntPtr Overlapped,  // 0 if the Windows thread pool is used, the relevant info could be obtained from the NativeOverlapped* if necessary
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+
+        [Event(59, Level = EventLevel.Informational, Message = Messages.MinMaxThreads, Task = Tasks.ThreadPoolMinMaxThreads, Opcode = EventOpcode.Info, Version = 0, Keywords = Keywords.ThreadingKeyword)]
+        public unsafe void ThreadPoolMinMaxThreads(
+            ushort MinWorkerThreads,
+            ushort MaxWorkerThreads,
+            ushort MinIOCompletionThreads,
+            ushort MaxIOCompletionThreads,
+            ushort ClrInstanceID = DefaultClrInstanceId)
+        {
+        }
+#endif
     }
 }

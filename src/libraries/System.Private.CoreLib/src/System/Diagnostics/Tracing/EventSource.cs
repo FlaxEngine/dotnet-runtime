@@ -251,7 +251,8 @@ namespace System.Diagnostics.Tracing
         /// </summary>
         public bool IsEnabled()
         {
-            return m_eventSourceEnabled;
+            return false; // Not needed by games
+            //return m_eventSourceEnabled;
         }
 
         /// <summary>

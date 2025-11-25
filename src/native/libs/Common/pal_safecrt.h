@@ -56,30 +56,4 @@ inline static bool add_s(size_t a, size_t b, size_t* result)
 
 typedef int errno_t;
 
-inline static errno_t memcpy_s(void* dst, size_t sizeInBytes, const void* src, size_t count)
-{
-    if (count > 0)
-    {
-        assert(dst != NULL);
-        assert(src != NULL);
-        assert(sizeInBytes >= count);
-        assert( // should be using memmove if this fails
-            ((const char*)dst + count <= (const char*)src) ||
-            ((const char*)src + count <= (const char*)dst));
-
-        if (dst == NULL)
-        {
-            return EINVAL;
-        }
-
-        if (src == NULL || sizeInBytes < count)
-        {
-            memset(dst, 0, sizeInBytes);
-            return src == NULL ? EINVAL : ERANGE;
-        }
-  
-        memcpy(dst, src, count);
-    }
-
-    return 0;
-}
+extern errno_t memcpy_s(void* dst, size_t sizeInBytes, const void* src, size_t count);

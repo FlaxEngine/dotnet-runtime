@@ -63,6 +63,10 @@
 #include <mono/profiler/aot.h>
 #include <mono/utils/w32api.h>
 
+#if TARGET_PS5
+#define MONO_ARCH_CODE_EXEC_ONLY 1
+#endif
+
 #include "aot-compiler.h"
 #include "aot-runtime.h"
 #include "seq-points.h"

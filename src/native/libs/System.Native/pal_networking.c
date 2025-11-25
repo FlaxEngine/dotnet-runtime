@@ -91,6 +91,11 @@ int32_t SystemNative_GetHostName(uint8_t* name, int32_t nameLength)
     return -1;
 }
 
+int32_t SystemNative_GetSocketAddressSizes(int32_t* ipv4SocketAddressSize, int32_t* ipv6SocketAddressSize, int32_t* udsSocketAddressSize, int32_t* maxSocketAddressSize)
+{
+    return -1;
+}
+
 int32_t SystemNative_GetAddressFamily(const uint8_t* socketAddress, int32_t socketAddressLen, int32_t* addressFamily)
 {
     return -1;

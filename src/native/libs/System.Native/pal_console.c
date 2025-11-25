@@ -6,11 +6,44 @@
 #include "pal_utilities.h"
 #include "pal_signal.h"
 
+errno_t memcpy_s(void* dst, size_t sizeInBytes, const void* src, size_t count)
+{
+    if (count > 0)
+    {
+        assert(dst != NULL);
+        assert(src != NULL);
+        assert(sizeInBytes >= count);
+        assert( // should be using memmove if this fails
+            ((const char*)dst + count <= (const char*)src) ||
+            ((const char*)src + count <= (const char*)dst));
+
+        if (dst == NULL)
+        {
+            return EINVAL;
+        }
+
+        if (src == NULL || sizeInBytes < count)
+        {
+            memset(dst, 0, sizeInBytes);
+            return src == NULL ? EINVAL : ERANGE;
+        }
+  
+        memcpy(dst, src, count);
+    }
+
+    return 0;
+}
+
 #if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
 
 /* Not supported */
 
 int32_t SystemNative_GetWindowSize(WinSize* windowSize)
+{
+    return -1;
+}
+
+int32_t SystemNative_SetWindowSize(WinSize* windowSize)
 {
     return -1;
 }

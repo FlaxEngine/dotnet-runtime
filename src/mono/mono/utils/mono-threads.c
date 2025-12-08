@@ -43,6 +43,10 @@
 #include <mono/utils/mach-support.h>
 #endif
 
+#if defined(TARGET_PS5) && !defined(WINVER)
+#include <pthread_np.h>
+#endif
+
 #if _MSC_VER
 #pragma warning(disable:4312) // FIXME pointer cast to different size
 #endif
@@ -296,9 +300,13 @@ dump_threads (void)
 	g_async_safe_printf ("\t0x?09\t- blocking suspend requested (GOOD in coop; BAD in hybrid)\n");
 
 	FOREACH_THREAD_SAFE_ALL (info) {
-#ifdef TARGET_MACH
+#if defined(TARGET_MACH) || (defined(TARGET_PS5) && !defined(WINVER))
 		char thread_name [256] = { 0 };
+#if defined(TARGET_PS5)
+		pthread_getname_np (mono_thread_info_get_tid (info), thread_name);
+#else
 		pthread_getname_np (mono_thread_info_get_tid (info), thread_name, 255);
+#endif
 
 		g_async_safe_printf ("--thread %p id %p [%p] (%s) state %x  %s\n", info, (gpointer)(gsize) mono_thread_info_get_tid (info), (void*)(size_t)info->native_handle, thread_name, info->thread_state.raw, info == cur ? "GC INITIATOR" : "" );
 #else

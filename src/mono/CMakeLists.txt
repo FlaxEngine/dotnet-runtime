@@ -330,9 +330,13 @@ elseif(CLR_CMAKE_HOST_OS STREQUAL "windows")
     add_compile_options(/Zi)   # enable debugging information
     add_link_options(/LTCG)    # link-time code generation
     add_link_options(/DEBUG)   # enable debugging information
-    add_link_options(/DEBUGTYPE:CV,FIXUP)   # enable fixup debug information
-    add_link_options(/OPT:REF) # optimize: remove unreferenced functions & data
-    add_link_options(/OPT:ICF) # optimize: enable COMDAT folding
+    add_linker_flag("/INCREMENTAL:NO")
+    add_compile_options(/favor:AMD64)
+    if(_GAMING_XBOX_SCARLETT)
+      add_compile_options(/arch:AVX2)
+    elseif(_GAMING_XBOX_XBOXONE)
+      add_compile_options(/arch:AVX)
+    endif()
   elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(/Oi)   # enable intrinsics
     add_compile_options(/GF)   # enable string pooling

@@ -143,7 +143,7 @@ namespace System.Threading
 
                 if (!usedSyncContextWait)
                 {
-#if !CORECLR // CoreCLR sends the wait events from the native side
+#if !CORECLR && FEATURE_PERFTRACING // CoreCLR sends the wait events from the native side
                     bool sendWaitEvents =
                         millisecondsTimeout != 0 &&
                         !useTrivialWaits &&
@@ -183,7 +183,7 @@ namespace System.Threading
                         waitResult = WaitOneCore(waitHandle.DangerousGetHandle(), millisecondsTimeout, useTrivialWaits);
                     }
 
-#if !CORECLR // CoreCLR sends the wait events from the native side
+#if !CORECLR && FEATURE_PERFTRACING // CoreCLR sends the wait events from the native side
                     if (sendWaitEvents)
                     {
                         NativeRuntimeEventSource.Log.WaitHandleWaitStop();
@@ -400,7 +400,7 @@ namespace System.Threading
         {
             int waitResult = WaitFailed;
 
-#if !CORECLR // CoreCLR sends the wait events from the native side
+#if !CORECLR && FEATURE_PERFTRACING // CoreCLR sends the wait events from the native side
             bool sendWaitEvents =
                 millisecondsTimeout != 0 &&
                 NativeRuntimeEventSource.Log.IsEnabled(
@@ -437,7 +437,7 @@ namespace System.Threading
                 waitResult = WaitMultipleIgnoringSyncContextCore(handles, waitAll, millisecondsTimeout);
             }
 
-#if !CORECLR // CoreCLR sends the wait events from the native side
+#if !CORECLR && FEATURE_PERFTRACING // CoreCLR sends the wait events from the native side
             if (sendWaitEvents)
             {
                 NativeRuntimeEventSource.Log.WaitHandleWaitStop();

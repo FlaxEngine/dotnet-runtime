@@ -55,8 +55,10 @@ namespace System.Threading
                 Win32ThreadPoolNativeOverlapped* overlapped = Win32ThreadPoolNativeOverlapped.Allocate(callback, state, pinData, preAllocated: null, flowExecutionContext);
                 overlapped->Data._boundHandle = this;
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                     NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(Win32ThreadPoolNativeOverlapped.ToNativeOverlapped(overlapped));
+#endif
 
                 Interop.Kernel32.StartThreadpoolIo(_threadPoolHandle!);
 
@@ -86,8 +88,10 @@ namespace System.Threading
 
                 data._boundHandle = this;
 
+#if FEATURE_PERFTRACING
                 if (NativeRuntimeEventSource.Log.IsEnabled())
                     NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(Win32ThreadPoolNativeOverlapped.ToNativeOverlapped(preAllocated._overlappedWindowsThreadPool));
+#endif
 
                 Interop.Kernel32.StartThreadpoolIo(_threadPoolHandle!);
 
@@ -158,8 +162,10 @@ namespace System.Threading
             ThreadPoolBoundHandle boundHandle = overlapped->Data._boundHandle ?? throw new InvalidOperationException(SR.Argument_NativeOverlappedAlreadyFree);
             boundHandle.Release();
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
                 NativeRuntimeEventSource.Log.ThreadPoolIODequeue(Win32ThreadPoolNativeOverlapped.ToNativeOverlapped(overlapped));
+#endif
 
             Win32ThreadPoolNativeOverlapped.CompleteWithCallback(ioResult, (uint)numberOfBytesTransferred, overlapped);
             ThreadPool.IncrementCompletedWorkItemCount();

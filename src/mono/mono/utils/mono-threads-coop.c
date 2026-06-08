@@ -276,7 +276,7 @@ mono_threads_enter_gc_safe_region_with_info (MonoThreadInfo *info, MonoStackData
 {
 	gpointer cookie;
 
-	if (!mono_threads_is_blocking_transition_enabled ())
+	if (!info || !mono_threads_is_blocking_transition_enabled ())
 		return NULL;
 
 	cookie = mono_threads_enter_gc_safe_region_unbalanced_with_info (info, stackdata);
@@ -340,7 +340,7 @@ retry:
 void
 mono_threads_exit_gc_safe_region_internal (gpointer cookie, MonoStackData *stackdata)
 {
-	if (!mono_threads_is_blocking_transition_enabled ())
+	if (!cookie || !mono_threads_is_blocking_transition_enabled ())
 		return;
 
 #ifdef ENABLE_CHECKED_BUILD_GC
@@ -366,7 +366,7 @@ mono_threads_exit_gc_safe_region_unbalanced_internal (gpointer cookie, MonoStack
 {
 	MonoThreadInfo *info;
 
-	if (!mono_threads_is_blocking_transition_enabled ())
+	if (!cookie || !mono_threads_is_blocking_transition_enabled ())
 		return;
 
 	/* Common to use enter/exit gc safe around OS API's affecting last error. */

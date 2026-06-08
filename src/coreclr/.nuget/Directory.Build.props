@@ -20,7 +20,7 @@
     transport packages to flow dependencies anymore -->
     <CreatePackedPackage Condition="'$(CreatePackedPackage)' == ''">false</CreatePackedPackage>
 
-    <SupportedPackageOSGroups Condition="'$(SupportedPackageOSGroups)' == ''">windows;osx;android;linux;freebsd;netbsd;illumos;solaris;haiku</SupportedPackageOSGroups>
+    <SupportedPackageOSGroups Condition="'$(SupportedPackageOSGroups)' == ''">windows;osx;android;linux;freebsd;netbsd;illumos;solaris;ps4;ps5;switch;haiku</SupportedPackageOSGroups>
     <SupportedPackageOSGroups>;$(SupportedPackageOSGroups);</SupportedPackageOSGroups>
 
     <_isSupportedOSGroup>true</_isSupportedOSGroup>
@@ -94,6 +94,15 @@
   </ItemGroup>
   <ItemGroup Condition="$(SupportedPackageOSGroups.Contains(';haiku;'))">
     <OfficialBuildRID Include="haiku-x64" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SupportedPackageOSGroups.Contains(';ps4;'))">
+    <OfficialBuildRID Include="ps4-x64" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SupportedPackageOSGroups.Contains(';ps5;'))">
+    <OfficialBuildRID Include="ps5-x64" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SupportedPackageOSGroups.Contains(';switch;'))">
+    <OfficialBuildRID Include="switch-arm64" />
   </ItemGroup>
   <ItemGroup Condition="$(SupportedPackageOSGroups.Contains(';windows;'))">
     <OfficialBuildRID Include="win-x86">

@@ -14,6 +14,15 @@ if (CLR_CMAKE_TARGET_APPLE)
     # This ensures an even playing field.
     include_directories(SYSTEM /usr/local/include)
     add_compile_options(-Wno-poison-system-directories)
+elseif (CLR_CMAKE_TARGET_PS4)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+elseif (CLR_CMAKE_TARGET_PS5)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+elseif (CLR_CMAKE_TARGET_SWITCH)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
 elseif (CLR_CMAKE_TARGET_FREEBSD)
     include_directories(SYSTEM ${CROSS_ROOTFS}/usr/local/include)
     set(CMAKE_REQUIRED_INCLUDES ${CROSS_ROOTFS}/usr/local/include)
@@ -533,6 +542,16 @@ if (CLR_CMAKE_TARGET_LINUX)
     set(HAVE_SUPPORT_FOR_DUAL_MODE_IPV4_PACKET_INFO 1)
 endif ()
 
+if (CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5)
+    set(HAVE_MALLOC_SIZE 0)
+    set(HAVE_MALLOC_USABLE_SIZE 1)
+    set(HAVE_MALLOC_USABLE_SIZE_NP 0)
+elseif (CLR_CMAKE_TARGET_SWITCH)
+    set(HAVE_MALLOC_SIZE 0)
+    set(HAVE_MALLOC_USABLE_SIZE 1)
+    set(HAVE_MALLOC_USABLE_SIZE_NP 0)
+    set(HAVE_POSIX_MEMALIGN 1)
+else()
 check_symbol_exists(
     malloc_size
     malloc/malloc.h
@@ -549,6 +568,7 @@ check_symbol_exists(
     posix_memalign
     stdlib.h
     HAVE_POSIX_MEMALIGN)
+endif()
 
 if(CLR_CMAKE_TARGET_IOS)
     # Manually set results from check_c_source_runs() since it's not possible to actually run it during CMake configure checking
@@ -651,6 +671,11 @@ check_symbol_exists(
     time.h
     HAVE_CLOCK_GETTIME_NSEC_NP)
 
+# Custom platform
+if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
+    unset(PTHREAD_LIBRARY)
+else()
+
 check_library_exists(pthread pthread_create "" HAVE_LIBPTHREAD)
 check_library_exists(c pthread_create "" HAVE_PTHREAD_IN_LIBC)
 
@@ -662,6 +687,8 @@ endif()
 
 if (NOT CLR_CMAKE_TARGET_WASI)
     check_library_exists(${PTHREAD_LIBRARY} pthread_condattr_setclock "" HAVE_PTHREAD_CONDATTR_SETCLOCK)
+endif()
+
 endif()
 
 check_symbol_exists(
@@ -784,6 +811,12 @@ check_c_source_compiles(
     }
     "
     HAVE_MKSTEMP)
+
+# Custom platform
+if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
+    set(HAVE_MKSTEMPS TRUE)
+    set(HAVE_MKSTEMP TRUE)
+endif()
 
 if (NOT HAVE_MKSTEMPS AND NOT HAVE_MKSTEMP AND NOT CLR_CMAKE_TARGET_WASI)
     message(FATAL_ERROR "Cannot find mkstemps nor mkstemp on this platform.")

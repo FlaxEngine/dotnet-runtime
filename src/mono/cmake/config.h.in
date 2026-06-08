@@ -507,6 +507,18 @@
 /* ... */
 #cmakedefine TARGET_PS3 1
 
+/* ... */
+#cmakedefine TARGET_PS4 1
+
+/* ... */
+#cmakedefine TARGET_PS5 1
+
+/* ... */
+#cmakedefine TARGET_SWITCH 1
+
+/* ... */
+#cmakedefine _GAMING_XBOX 1
+
 /* Target is RISC-V */
 #cmakedefine TARGET_RISCV 1
 

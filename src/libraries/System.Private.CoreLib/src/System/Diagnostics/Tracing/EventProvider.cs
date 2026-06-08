@@ -32,6 +32,7 @@ namespace System.Diagnostics.Tracing
         Disable = -3,
     }
 
+#if FEATURE_ETW
     /// <summary>
     /// Only here because System.Diagnostics.EventProvider needs one more extensibility hook (when it gets a
     /// controller callback)
@@ -1362,4 +1363,31 @@ namespace System.Diagnostics.Tracing
         }
     }
 #pragma warning restore CA1852
+#else
+    /// <summary>
+    /// Not supported.
+    /// </summary>
+    internal sealed class EventProvider : IDisposable
+    {
+        public enum WriteEventErrorCode : int
+        {
+            NoError = 0,
+            NoFreeBuffers = 1,
+            EventTooBig = 2,
+            NullInput = 3,
+            TooManyArgs = 4,
+            Other = 5,
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
+
+        public static WriteEventErrorCode GetLastWriteEventError()
+        {
+            return WriteEventErrorCode.NoError;
+        }
+    }
+#endif
 }

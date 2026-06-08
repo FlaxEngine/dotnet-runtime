@@ -22,8 +22,15 @@ if(CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_WASI)
     add_compile_options(-Wno-extra-semi-stmt)
     add_compile_options(-Wno-unknown-warning-option)
 
+    if (CLR_CMAKE_TARGET_PS4)
+        set(ICU_HOMEBREW_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../ps4")
+    elseif (CLR_CMAKE_TARGET_PS5)
+        set(ICU_HOMEBREW_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../ps5")
+    elseif (CLR_CMAKE_TARGET_SWITCH)
+        set(ICU_HOMEBREW_INC_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../switch")
+    elseif (NOT CLR_CMAKE_TARGET_ANDROID AND NOT DEFINED CMAKE_ICU_DIR)
     # The mobile configurations in particular bring their own ICU, so skip
-    if (NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT DEFINED CMAKE_ICU_DIR AND NOT CLR_CMAKE_TARGET_BROWSER)
+    elseif (NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT DEFINED CMAKE_ICU_DIR AND NOT CLR_CMAKE_TARGET_BROWSER)
         if (CLR_CMAKE_TARGET_OSX)
             execute_process(COMMAND  brew --prefix OUTPUT_VARIABLE brew_prefix OUTPUT_STRIP_TRAILING_WHITESPACE)
             set(ICU_HOMEBREW_INC_PATH "${brew_prefix}/opt/icu4c/include")
@@ -86,6 +93,7 @@ endif()
 if (NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND DEFINED CMAKE_ICU_DIR)
     include_directories(${CMAKE_ICU_DIR}/include)
     link_libraries(${CMAKE_ICU_DIR}/lib/libicuuc.a ${CMAKE_ICU_DIR}/lib/libicui18n.a ${CMAKE_ICU_DIR}/lib/libicudata.a)
+
     link_libraries(stdc++)
 endif()
 
@@ -210,7 +218,9 @@ if(NOT CLR_CMAKE_TARGET_WIN32 AND NOT CLR_CMAKE_TARGET_APPLE AND NOT CLR_CMAKE_T
 endif()
 
 if(CLR_CMAKE_TARGET_WIN32)
-    if(STATIC_LIBS_ONLY)
+    if(_GAMING_XBOX)
+        target_compile_options(System.Globalization.Native-Static PRIVATE /GL-)
+    elseif(STATIC_LIBS_ONLY)
         add_library(System.Globalization.Native.Aot
             STATIC
             ${NATIVEGLOBALIZATION_SOURCES}

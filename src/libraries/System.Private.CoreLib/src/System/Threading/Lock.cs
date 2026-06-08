@@ -470,10 +470,14 @@ namespace System.Threading
             return currentThreadId;
 
         Wait:
+#if FEATURE_PERFTRACING
             bool areContentionEventsEnabled =
                 NativeRuntimeEventSource.Log.IsEnabled(
                     EventLevel.Informational,
                     NativeRuntimeEventSource.Keywords.ContentionKeyword);
+#else
+            bool areContentionEventsEnabled = false;
+#endif
             AutoResetEvent waitEvent = _waitEvent ?? CreateWaitEvent(areContentionEventsEnabled);
             if (State.TryLockBeforeWait(this))
             {
@@ -487,12 +491,14 @@ namespace System.Threading
             {
                 Interlocked.Increment(ref s_contentionCount);
 
+#if FEATURE_PERFTRACING
                 long waitStartTimeTicks = 0;
                 if (areContentionEventsEnabled)
                 {
                     NativeRuntimeEventSource.Log.ContentionStart(this);
                     waitStartTimeTicks = Stopwatch.GetTimestamp();
                 }
+#endif
 
                 using ThreadBlockingInfo.Scope threadBlockingScope = new(this, timeoutMs);
 
@@ -560,12 +566,14 @@ namespace System.Threading
                     Debug.Assert(_recursionCount == 0);
                     _owningThreadId = currentThreadId.Id;
 
+#if FEATURE_PERFTRACING
                     if (areContentionEventsEnabled)
                     {
                         double waitDurationNs =
                             (Stopwatch.GetTimestamp() - waitStartTimeTicks) * 1_000_000_000.0 / Stopwatch.Frequency;
                         NativeRuntimeEventSource.Log.ContentionStop(waitDurationNs);
                     }
+#endif
 
                     return currentThreadId;
                 }
@@ -614,11 +622,13 @@ namespace System.Threading
             AutoResetEvent? waitEventBeforeUpdate = Interlocked.CompareExchange(ref _waitEvent, newWaitEvent, null);
             if (waitEventBeforeUpdate == null)
             {
+#if FEATURE_PERFTRACING
                 // Also check NativeRuntimeEventSource.Log.IsEnabled() to enable trimming
                 if (areContentionEventsEnabled && NativeRuntimeEventSource.Log.IsEnabled())
                 {
                     NativeRuntimeEventSource.Log.ContentionLockCreated(this);
                 }
+#endif
 
                 return newWaitEvent;
             }

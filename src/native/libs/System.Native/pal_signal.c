@@ -17,6 +17,54 @@
 
 #include <minipal/thread.h>
 
+#if (defined(TARGET_SWITCH) && TARGET_SWITCH)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
+#if (defined(TARGET_PS5) && TARGET_PS5)
+
+void SystemNative_RegisterForSigChld(SigChldCallback callback)
+{
+}
+
+void SystemNative_SetDelayedSigChildConsoleConfigurationHandler(void (*callback)(void))
+{
+}
+
+void SystemNative_SetTerminalInvalidationHandler(TerminalInvalidationCallback callback)
+{
+}
+
+int32_t SystemNative_EnablePosixSignalHandling(int signalCode)
+{
+    return 0;
+}
+
+void SystemNative_DisablePosixSignalHandling(int signalCode)
+{
+}
+
+void SystemNative_HandleNonCanceledPosixSignal(int32_t signalCode)
+{
+}
+
+void SystemNative_SetPosixSignalHandler(PosixSignalHandler signalHandler)
+{
+}
+
+int32_t SystemNative_GetPlatformSignalNumber(PosixSignal signal)
+{
+    return 0;
+}
+
+#else
+
+#if TARGET_SWITCH
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 // Saved signal handlers
@@ -130,7 +178,7 @@ static bool TryConvertSignalCodeToPosixSignal(int signalCode, PosixSignal* posix
             return true;
 
         default:
-            *posixSignal = signalCode;
+            *posixSignal = (PosixSignal)signalCode;
             return false;
     }
 }
@@ -697,6 +745,8 @@ void UninstallTTOUHandlerForConsole(void)
     }
     pthread_mutex_unlock(&lock);
 }
+
+#endif
 
 #ifndef HAS_CONSOLE_SIGNALS
 

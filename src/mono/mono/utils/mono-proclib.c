@@ -29,6 +29,14 @@
 #endif
 #endif
 
+#if defined(__ORBIS__)
+#include "mono-proclib-orbis.c"
+#elif defined(__PROSPERO__)
+#include "mono-proclib-prospero.c"
+#elif defined(__SWITCH__)
+#include "mono-proclib-switch.c"
+#else
+
 #if defined(HOST_BROWSER)
 int mono_wasm_process_current_pid ();
 #endif
@@ -238,3 +246,4 @@ mono_cpu_limit (void)
 #endif
 }
 
+#endif

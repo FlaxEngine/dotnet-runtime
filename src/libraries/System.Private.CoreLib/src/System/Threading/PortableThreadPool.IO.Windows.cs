@@ -132,10 +132,12 @@ namespace System.Threading
                 EnsureIOCompletionPollers();
             }
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
             {
                 NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(nativeOverlapped);
             }
+#endif
 
             uint selectedPortIndex =
                 IOCompletionPortCount == 1
@@ -290,10 +292,12 @@ namespace System.Threading
                         continue;
                     }
 
+#if FEATURE_PERFTRACING
                     if (NativeRuntimeEventSource.Log.IsEnabled())
                     {
                         NativeRuntimeEventSource.Log.ThreadPoolIODequeue(nativeOverlapped);
                     }
+#endif
 
                     IOCompletionCallbackHelper.PerformSingleIOCompletionCallback(errorCode, bytesTransferred, nativeOverlapped);
                 }
@@ -303,10 +307,12 @@ namespace System.Threading
             {
                 public void Invoke()
                 {
+#if FEATURE_PERFTRACING
                     if (NativeRuntimeEventSource.Log.IsEnabled())
                     {
                         NativeRuntimeEventSource.Log.ThreadPoolIODequeue(nativeOverlapped);
                     }
+#endif
 
                     // The NtStatus code for the operation is in the InternalLow field
                     uint ntStatus = (uint)(nint)nativeOverlapped->InternalLow;

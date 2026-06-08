@@ -112,11 +112,13 @@ namespace System.Threading
                             continue;
                         }
 
+#if FEATURE_PERFTRACING
                         if (ThreadPool.EnableWorkerTracking && NativeRuntimeEventSource.Log.IsEnabled())
                         {
                             NativeRuntimeEventSource.Log.ThreadPoolWorkingThreadCount(
                                 (uint)threadPoolInstance.GetAndResetHighWatermarkCountOfThreadsProcessingUserCallbacks());
                         }
+#endif
 
                         // Determine whether CPU utilization should be updated. CPU utilization is only used by the starvation
                         // heuristic and hill climbing, and neither of those are active when there is a pending blocking

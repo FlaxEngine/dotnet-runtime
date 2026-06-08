@@ -16,6 +16,7 @@ set(eglib_unix_sources
 
 if(HOST_WIN32)
 set(eglib_platform_sources ${eglib_win32_sources})
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
 set(eglib_platform_sources ${eglib_unix_sources})
 endif()

@@ -1,5 +1,23 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Custom platforms (external)
+if(TARGET_SYSTEM_NAME STREQUAL "ps4")
+  message("Build libs/CMakeLists.txt for PS4")
+  include(../../ps4/PS4Toolchain.txt)
+elseif(TARGET_SYSTEM_NAME STREQUAL "ps5")
+  message("Build libs/CMakeLists.txt for PS5")
+  include(../../ps5/PS5Toolchain.txt)
+elseif(TARGET_SYSTEM_NAME STREQUAL "switch")
+  message("Build libs/CMakeLists.txt for Switch")
+  include(../../switch/SwitchToolchain.cmake)
+elseif(_GAMING_XBOX OR $ENV{_GAMING_XBOX})
+  message("Build libs/CMakeLists.txt for Xbox")
+  set(_GAMING_XBOX ON)
+  set(STATIC_LIBS_ONLY ON)
+else()
+  message("Build libs/CMakeLists.txt for ${TARGET_SYSTEM_NAME} (defualt)")
+endif()
+
 include(CheckCCompilerFlag)
 
 project(LibsNative C)
@@ -16,9 +34,16 @@ include_directories(${CLR_SRC_NATIVE_DIR})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+if(_GAMING_XBOX)
+  enable_language(CXX)
+endif()
+
 if (STATIC_LIBS_ONLY)
     # Suppress exporting of the PAL APIs
+    if(CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
+    else()
     add_definitions(-DPALEXPORT=EXTERN_C)
+    endif ()
 
     set(GEN_SHARED_LIB 0)
     set(STATIC_LIB_DESTINATION lib)
@@ -35,7 +60,27 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
     endif ()
 
     set(CMAKE_INSTALL_PREFIX $ENV{__CMakeBinDir})
+    if(CLR_CMAKE_TARGET_PS4)
+        include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps4")
+        add_definitions(-include fwd_decls.h)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-declaration-after-statement")
+        add_definitions(-include fwd_decls.h)
+        add_compile_options(-Wno-missing-prototypes)
+    elseif(CLR_CMAKE_TARGET_PS5)
+        include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../ps5")
+        add_definitions(-include fwd_decls.h)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-declaration-after-statement")
+        add_definitions(-include fwd_decls.h)
+        add_compile_options(-Wno-missing-prototypes)
+    elseif(CLR_CMAKE_TARGET_SWITCH)
+        include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../switch")
+        add_definitions(-include fwd_decls.h)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-declaration-after-statement")
+        add_definitions(-include fwd_decls.h)
+        add_compile_options(-Wno-unused-but-set-variable)
+    else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wno-declaration-after-statement")
+    endif()
 
     if (CLR_CMAKE_TARGET_BROWSER)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pre-c11-compat")
@@ -149,6 +194,8 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
     add_subdirectory(System.Globalization.Native)
 
     if (CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
+        # skip for now
+    elseif (CLR_CMAKE_TARGET_PS4 OR CLR_CMAKE_TARGET_PS5 OR CLR_CMAKE_TARGET_SWITCH)
         # skip for now
     elseif (CLR_CMAKE_TARGET_APPLE)
         if (NOT CLR_CMAKE_TARGET_TVOS) # no gssapi on tvOS, see https://developer.apple.com/documentation/gss

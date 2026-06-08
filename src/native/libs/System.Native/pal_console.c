@@ -6,6 +6,113 @@
 #include "pal_utilities.h"
 #include "pal_signal.h"
 
+errno_t memcpy_s(void* dst, size_t sizeInBytes, const void* src, size_t count)
+{
+    if (count > 0)
+    {
+        assert(dst != NULL);
+        assert(src != NULL);
+        assert(sizeInBytes >= count);
+        assert( // should be using memmove if this fails
+            ((const char*)dst + count <= (const char*)src) ||
+            ((const char*)src + count <= (const char*)dst));
+
+        if (dst == NULL)
+        {
+            return EINVAL;
+        }
+
+        if (src == NULL || sizeInBytes < count)
+        {
+            memset(dst, 0, sizeInBytes);
+            return src == NULL ? EINVAL : ERANGE;
+        }
+  
+        memcpy(dst, src, count);
+    }
+
+    return 0;
+}
+
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
+
+/* Not supported */
+
+int32_t SystemNative_GetWindowSize(intptr_t fd, WinSize* windowSize)
+{
+    return -1;
+}
+
+int32_t SystemNative_IsATty(intptr_t fd)
+{
+    return -1;
+}
+
+void SystemNative_SetKeypadXmit(intptr_t fd, const char* terminfoString)
+{
+}
+
+void UninitializeTerminal()
+{
+}
+
+void SystemNative_InitializeConsoleBeforeRead(uint8_t minChars, uint8_t decisecondsTimeout)
+{
+}
+
+void SystemNative_UninitializeConsoleAfterRead()
+{
+}
+
+void SystemNative_ConfigureTerminalForChildProcess(int32_t childUsesTerminal)
+{
+}
+
+void SystemNative_GetControlCharacters(
+    int32_t* controlCharacterNames, uint8_t* controlCharacterValues, int32_t controlCharacterLength,
+    uint8_t* posixDisableValue)
+{
+}
+
+int32_t SystemNative_StdinReady(void)
+{
+    return -1;
+}
+
+int32_t SystemNative_ReadStdin(void* buffer, int32_t bufferSize)
+{
+    return -1;
+}
+
+int32_t SystemNative_GetSignalForBreak()
+{
+    return -1;
+}
+
+int32_t SystemNative_SetSignalForBreak(int32_t signalForBreak)
+{
+    return -1;
+}
+
+void ReinitializeTerminal()
+{
+}
+
+static void InitializeTerminalCore()
+{
+}
+
+int32_t SystemNative_InitializeTerminalAndSignalHandling()
+{
+    return 0;
+}
+
+void SystemNative_UninitializeTerminal(void)
+{
+}
+
+#else
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -478,3 +585,5 @@ void SystemNative_UninitializeTerminal(void)
 {
     UninitializeTerminal();
 }
+
+#endif

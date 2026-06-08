@@ -10,6 +10,7 @@ namespace System.Diagnostics.Tracing
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "NativeRuntimeEventSource is a special case where event methods don't use WriteEvent/WriteEventCore but still need to be instance methods.")]
     internal sealed partial class NativeRuntimeEventSource : EventSource
     {
+#if FEATURE_PERFTRACING
         private static partial class Messages
         {
             public const string ContentionLockCreated = "LockID={0};\nAssociatedObjectID={1};\nClrInstanceID={2}";
@@ -366,5 +367,6 @@ namespace System.Diagnostics.Tracing
             Debug.Assert(IsEnabled(EventLevel.Verbose, Keywords.WaitHandleKeyword));
             LogWaitHandleWaitStop(ClrInstanceID);
         }
+#endif
     }
 }

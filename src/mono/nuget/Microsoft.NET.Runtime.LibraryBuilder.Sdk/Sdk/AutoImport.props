@@ -5,5 +5,8 @@
 
     <TargetsAppleMobile Condition="'$(TargetOS)' == 'ios' or '$(TargetOS)' == 'iossimulator' or '$(TargetOS)' == 'maccatalyst' or '$(TargetOS)' == 'tvos' or '$(TargetOS)' == 'tvossimulator'">true</TargetsAppleMobile>
     <TargetsAndroid Condition="'$(TargetOS)' == 'android'">true</TargetsAndroid>
+    <TargetsPS4 Condition="'$(TargetOS)' == 'ps4'">true</TargetsPS4>
+    <TargetsPS5 Condition="'$(TargetOS)' == 'ps5'">true</TargetsPS5>
+    <TargetsSwitch Condition="'$(TargetOS)' == 'switch'">true</TargetsSwitch>
   </PropertyGroup>
 </Project>

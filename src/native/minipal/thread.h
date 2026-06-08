@@ -56,6 +56,8 @@ static inline size_t minipal_get_current_thread_id_no_cache(void)
     uint64_t thread_id;
     pthread_threadid_np(pthread_self(), &thread_id);
     tid = (size_t)thread_id;  // Cast the uint64_t thread ID to size_t
+#elif defined(__ORBIS__) || defined(__PROSPERO__)
+    tid = (size_t)(void*)pthread_self();
 #elif defined(__FreeBSD__)
     tid = (size_t)pthread_getthreadid_np();
 #elif defined(__NetBSD__)
@@ -65,6 +67,8 @@ static inline size_t minipal_get_current_thread_id_no_cache(void)
 #elif defined(__sun)
     tid = (size_t)pthread_self();
 #elif defined(__wasm)
+    tid = (size_t)(void*)pthread_self();
+#elif defined(__SWITCH__)
     tid = (size_t)(void*)pthread_self();
 #else
 #error "Unsupported platform"
@@ -132,6 +136,8 @@ static inline int minipal_set_thread_name(pthread_t thread, const char* name)
     return pthread_setname_np(threadName);
 #elif defined(__HAIKU__)
     return rename_thread(get_pthread_thread_id(thread), threadName);
+#elif defined(__ORBIS__) || defined(__PROSPERO__)
+    return 0;
 #else
     return pthread_setname_np(thread, threadName);
 #endif

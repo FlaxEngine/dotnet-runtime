@@ -108,13 +108,17 @@ MONO_DISABLE_WARNING(4334)
 /* The single step trampoline */
 static gpointer ss_trampoline;
 
+#ifndef DISABLE_JIT
 /* The breakpoint trampoline */
 static gpointer bp_trampoline;
+#endif
 
 static gboolean ios_abi;
 static gboolean enable_ptrauth;
 
+#ifndef DISABLE_JIT
 static char opcode_simd_status[OP_LAST - OP_START];
+#endif
 
 #if defined(HOST_WIN32)
 #define WARN_UNUSED_RESULT _Check_return_
@@ -384,8 +388,10 @@ mono_arch_init (void)
 	enable_ptrauth = TRUE;
 #endif
 
+#ifndef DISABLE_JIT
 	if (!mono_aot_only)
 		bp_trampoline = mini_get_breakpoint_trampoline ();
+#endif
 
 	mono_arm_gsharedvt_init ();
 
@@ -1192,6 +1198,8 @@ gboolean
 mono_arch_have_fast_tls (void)
 {
 #if defined(TARGET_IOS) || defined(TARGET_TVOS)
+	return FALSE;
+#elif defined(TARGET_SWTICH)
 	return FALSE;
 #else
 	return TRUE;

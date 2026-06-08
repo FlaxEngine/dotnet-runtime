@@ -11,6 +11,7 @@ namespace System.Diagnostics.Tracing
     // Contains the implementation of threading events. This implementation is used by runtime not supporting NativeRuntimeEventSource.Threading.NativeSinks.cs.
     internal sealed partial class NativeRuntimeEventSource : EventSource
     {
+#if FEATURE_PERFTRACING
         // We don't have these keywords defined from the genRuntimeEventSources.py, so we need to manually define them here.
         public static partial class Keywords
         {
@@ -578,5 +579,12 @@ namespace System.Diagnostics.Tracing
             data[0].Reserved = 0;
             WriteEventCore(302, 1, data);
         }
+#else
+        public enum WaitHandleWaitSourceMap : byte
+        {
+            Unknown,
+            MonitorWait,
+        }
+#endif
     }
 }

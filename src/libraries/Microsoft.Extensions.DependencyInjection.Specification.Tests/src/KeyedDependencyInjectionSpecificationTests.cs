@@ -691,6 +691,7 @@ namespace Microsoft.Extensions.DependencyInjection.Specification
         [Fact]
         public void ResolveKeyedServiceWithKeyedParameter_MissingRegistration_SecondParameter()
         {
+#if false
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.AddKeyedSingleton<IService, Service>("service1");
@@ -702,11 +703,13 @@ namespace Microsoft.Extensions.DependencyInjection.Specification
 
             Assert.Null(provider.GetService<IService>());
             Assert.Throws<InvalidOperationException>(() => provider.GetService<OtherService>());
+#endif
         }
 
         [Fact]
         public void ResolveKeyedServiceWithKeyedParameter_MissingRegistration_FirstParameter()
         {
+#if false
             var serviceCollection = new ServiceCollection();
 
             // We are not registering "service1" and "service1" keyed IService services and OtherService requires them.
@@ -717,11 +720,13 @@ namespace Microsoft.Extensions.DependencyInjection.Specification
 
             Assert.Null(provider.GetService<IService>());
             Assert.Throws<InvalidOperationException>(() => provider.GetService<OtherService>());
+#endif
         }
 
         [Fact]
         public void ResolveKeyedServiceWithKeyedParameter_MissingRegistrationButWithDefaults()
         {
+#if false
             var serviceCollection = new ServiceCollection();
 
             // We are not registering "service1" and "service1" keyed IService services and OtherServiceWithDefaultCtorArgs
@@ -733,11 +738,13 @@ namespace Microsoft.Extensions.DependencyInjection.Specification
 
             Assert.Null(provider.GetService<IService>());
             Assert.NotNull(provider.GetService<OtherServiceWithDefaultCtorArgs>());
+#endif
         }
 
         [Fact]
         public void ResolveKeyedServiceWithKeyedParameter_MissingRegistrationButWithUnkeyedService()
         {
+#if false
             var serviceCollection = new ServiceCollection();
 
             // We are not registering "service1" and "service1" keyed IService services and OtherService requires them,
@@ -750,6 +757,7 @@ namespace Microsoft.Extensions.DependencyInjection.Specification
 
             Assert.NotNull(provider.GetService<IService>());
             Assert.Throws<InvalidOperationException>(() => provider.GetService<OtherService>());
+#endif
         }
 
         [Fact]

@@ -132,7 +132,7 @@ mono_log_write_logfile (const char *log_domain, GLogLevelFlags level, mono_bool 
 
 		pid = mono_process_current_pid ();
 
-		fprintf (logFile, "%s level[%c] mono[%d]: %s\n", logTime, mapLogFileLevel (level), pid, message);
+		fprintf (logFile, "%s level[%c] mono[%d]: %s\n", logTime, mapLogFileLevel (level), (int)pid, message);
 	} else {
 		fprintf (logFile, "%s%s%s\n",
 			log_domain != NULL ? log_domain : "",

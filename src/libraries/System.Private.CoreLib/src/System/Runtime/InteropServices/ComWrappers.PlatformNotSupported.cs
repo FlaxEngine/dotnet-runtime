@@ -27,14 +27,15 @@ namespace System.Runtime.InteropServices
 
         protected virtual object? CreateObject(IntPtr externalComObject, CreateObjectFlags flags, object? userState, out CreatedWrapperFlags wrapperFlags)
         {
-            throw new PlatformNotSupportedException();
+            wrapperFlags = CreatedWrapperFlags.None;
+            return false;
         }
 
         protected internal abstract void ReleaseObjects(IEnumerable objects);
 
         public static unsafe bool TryGetComInstance(object obj, out IntPtr unknown)
         {
-            unknown = default;
+            unknown = IntPtr.Zero;
             return false;
         }
 

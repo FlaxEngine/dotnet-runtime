@@ -12,6 +12,7 @@ for %%i in ("%__repoRoot%") do set "__repoRoot=%%~fi"
 set "__engNativeDir=%__repoRoot%\eng\native"
 set "__artifactsDir=%__repoRoot%\artifacts"
 set __CMakeBinDir=""
+set __CMakeArgs=""
 set __IntermediatesDir=""
 set __BuildArch=x64
 set __BuildTarget="build"
@@ -36,9 +37,9 @@ if /i [%1] == [x64]         ( set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [amd64]       ( set __BuildArch=x64&&shift&goto Arg_Loop)
 if /i [%1] == [arm64]       ( set __BuildArch=arm64&&shift&goto Arg_Loop)
 if /i [%1] == [wasm]        ( set __BuildArch=wasm&&shift&goto Arg_Loop)
-
+if /i [%1] == [cmakeargs]   ( set __CMakeArgs=%2&&shift&&shift&goto Arg_Loop)
 if /i [%1] == [outconfig] ( set __outConfig=%2&&shift&&shift&goto Arg_Loop)
-
+if /i [%1] == [os]      ( set __TargetOS=%2&&shift&&shift&goto Arg_Loop)
 if /i [%1] == [browser] ( set __TargetOS=browser&&shift&goto Arg_Loop)
 if /i [%1] == [wasi] ( set __TargetOS=wasi&&shift&goto Arg_Loop)
 
@@ -61,8 +62,7 @@ call "%__engNativeDir%\init-vs-env.cmd" %__BuildArch%
 if NOT [%errorlevel%] == [0] goto :Failure
 
 :: Setup to cmake the native components
-echo Commencing build of native components
-echo.
+echo Commencing build of native components (os=%__TargetOS%, arch=%__BuildArch%)
 
 if "%__TargetOS%"=="android" (
     set __CrossTarget=1
@@ -81,6 +81,10 @@ if %__CrossTarget% EQU 0 (
 set __cmakeRepoRoot=%__repoRoot:\=/%
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCMAKE_REPO_ROOT=%__cmakeRepoRoot%"
 set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
+
+if /i "%__TargetOS%" == "ps4" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=ps4")
+if /i "%__TargetOS%" == "ps5" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=ps5")
+if /i "%__TargetOS%" == "switch" (set __ExtraCmakeParams=%__ExtraCmakeParams% "-DTARGET_SYSTEM_NAME=switch")
 
 if NOT %__icuDir% == "" (
     set __ExtraCmakeParams=%__ExtraCmakeParams% "-DCMAKE_ICU_DIR=%__icuDir%"
@@ -124,7 +128,8 @@ if /i "%__TargetOS%" == "linux-bionic" (
 
 :: Regenerate the VS solution
 
-call "%__repoRoot%\eng\native\gen-buildsys.cmd" "%__sourceRootDir%" "%__IntermediatesDir%" %VisualStudioVersion% %__BuildArch% %__TargetOS% %__ExtraCmakeParams%
+echo [libs/build-native.cmd] "%__repoRoot%\eng\native\gen-buildsys.cmd" "%__sourceRootDir%" "%__IntermediatesDir%" %VisualStudioVersion% %__BuildArch% %__TargetOS% %__ExtraCmakeParams% %__CMakeArgs%
+call "%__repoRoot%\eng\native\gen-buildsys.cmd" "%__sourceRootDir%" "%__IntermediatesDir%" %VisualStudioVersion% %__BuildArch% %__TargetOS% %__ExtraCmakeParams% %__CMakeArgs%
 if NOT [%errorlevel%] == [0] goto :Failure
 
 :BuildNativeProj
@@ -140,6 +145,7 @@ if [%__Ninja%] == [1] (
     set __generatorArgs=
 )
 
+echo [libs/build-native.cmd] %CMakePath% --build %__IntermediatesDir% --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 call "%CMakePath%" --build "%__IntermediatesDir%" --target install --config %CMAKE_BUILD_TYPE% -- %__generatorArgs%
 IF ERRORLEVEL 1 (
     goto :Failure

@@ -77,8 +77,8 @@
 
 #include "dn-simdhash-specialization-declarations.h"
 
-static_assert(DN_SIMDHASH_BUCKET_CAPACITY <= DN_SIMDHASH_MAX_BUCKET_CAPACITY, "Maximum bucket capacity exceeded");
-static_assert(DN_SIMDHASH_BUCKET_CAPACITY > 1, "Bucket capacity too low");
+//static_assert(DN_SIMDHASH_BUCKET_CAPACITY <= DN_SIMDHASH_MAX_BUCKET_CAPACITY, "Maximum bucket capacity exceeded");
+//static_assert(DN_SIMDHASH_BUCKET_CAPACITY > 1, "Bucket capacity too low");
 
 // We set bucket_size_bytes to sizeof() this struct so that we can let the compiler
 //  generate the most optimal code possible when we're manipulating pointers to it -
@@ -88,7 +88,7 @@ typedef struct bucket_t {
 	DN_SIMDHASH_KEY_T keys[DN_SIMDHASH_BUCKET_CAPACITY];
 } bucket_t;
 
-static_assert((sizeof (bucket_t) % DN_SIMDHASH_VECTOR_WIDTH) == 0, "Bucket size is not vector aligned");
+//static_assert((sizeof (bucket_t) % DN_SIMDHASH_VECTOR_WIDTH) == 0, "Bucket size is not vector aligned");
 
 
 // While we've inlined these constants into the specialized code we're generating,

@@ -3,6 +3,10 @@
 
 #include <minipal/debugger.h>
 
+#if defined(__PROSPERO__) || defined(__ORBIS__)
+#undef __FreeBSD__
+#endif
+
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>

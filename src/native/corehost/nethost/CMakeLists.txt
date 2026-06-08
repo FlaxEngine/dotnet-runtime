@@ -11,6 +11,16 @@ if(CLR_CMAKE_TARGET_WIN32)
         Exports.def)
 endif()
 
+if(CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
+include(../hostmisc/hostmisc.cmake)
+if(CLR_CMAKE_TARGET_PS4)
+    list(APPEND SOURCES ../../../ps4/pal-unix-emul.c)
+elseif(CLR_CMAKE_TARGET_PS5)
+    list(APPEND SOURCES ../../../ps5/pal-unix-emul.c)
+endif()
+include(../lib_static.cmake)
+endif()
+
 add_compile_definitions(
     EXPORT_SHARED_API
     FEATURE_LIBHOST
@@ -48,7 +58,9 @@ target_link_libraries (libnethost PUBLIC ${CMAKE_DL_LIBS})
 install(FILES ../coreclr_delegates.h DESTINATION corehost)
 install(FILES ../hostfxr.h DESTINATION corehost)
 install(FILES nethost.h DESTINATION corehost)
+if(NOT CLR_CMAKE_TARGET_STATIC_LIBS_ONLY)
 install_with_stripped_symbols(nethost TARGETS corehost)
+endif()
 
 if (MSVC)
     # We ship libnethost.lib as a static library for external consumption, so

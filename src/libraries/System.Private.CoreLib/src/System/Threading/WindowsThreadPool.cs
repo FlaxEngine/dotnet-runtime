@@ -190,8 +190,10 @@ namespace System.Threading
 
         private static unsafe void NativeOverlappedCallback(nint overlappedPtr)
         {
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
                 NativeRuntimeEventSource.Log.ThreadPoolIODequeue((NativeOverlapped*)overlappedPtr);
+#endif
 
             IOCompletionCallbackHelper.PerformSingleIOCompletionCallback(0, 0, (NativeOverlapped*)overlappedPtr);
         }
@@ -207,8 +209,10 @@ namespace System.Threading
             // OS doesn't signal handle, so do it here
             overlapped->InternalLow = (IntPtr)0;
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
                 NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(overlapped);
+#endif
 
             // Both types of callbacks are executed on the same thread pool
             return ThreadPool.UnsafeQueueUserWorkItem(NativeOverlappedCallback, (nint)overlapped, preferLocal: false);

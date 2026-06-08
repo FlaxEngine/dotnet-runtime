@@ -12,8 +12,10 @@ namespace System
 #pragma warning restore CA2255
         internal static void Initialize()
         {
+#if FEATURE_PERFTRACING
             if (IsSupported)
                 ProcessStartupHooks(Environment.GetEnvironmentVariable("DOTNET_STARTUP_HOOKS"));
+#endif
         }
     }
 }

@@ -9,6 +9,12 @@
 #include "pal_safecrt.h"
 #include "pal_types.h"
 
+#if defined(TARGET_PS4) && TARGET_PS4
+#include <pal_io_orbis.h>
+#elif defined(TARGET_PS5) && TARGET_PS5
+#include <pal_io_prospero.h>
+#endif
+
 #include <assert.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -350,7 +356,7 @@ int32_t SystemNative_Close(intptr_t fd)
 
 intptr_t SystemNative_Dup(intptr_t oldfd)
 {
-    int result;
+    intptr_t result;
 #if HAVE_F_DUPFD_CLOEXEC
     while ((result = fcntl(ToFileDescriptor(oldfd), F_DUPFD_CLOEXEC, 0)) < 0 && errno == EINTR);
 #elif HAVE_F_DUPFD

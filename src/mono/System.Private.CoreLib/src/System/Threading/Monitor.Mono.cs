@@ -127,6 +127,7 @@ namespace System.Threading
             if (!ObjectHeader.HasOwner(obj))
                 throw new SynchronizationLockException();
 
+#if FEATURE_PERFTRACING
             bool sendWaitEvents =
                 millisecondsTimeout != 0 &&
                 NativeRuntimeEventSource.Log.IsEnabled(EventLevel.Verbose, NativeRuntimeEventSource.Keywords.WaitHandleKeyword);
@@ -134,13 +135,16 @@ namespace System.Threading
             {
                 NativeRuntimeEventSource.Log.WaitHandleWaitStart(NativeRuntimeEventSource.WaitHandleWaitSourceMap.MonitorWait, obj);
             }
+#endif
 
             bool result = Monitor_wait(obj, millisecondsTimeout, true);
 
+#if FEATURE_PERFTRACING
             if (sendWaitEvents)
             {
                 NativeRuntimeEventSource.Log.WaitHandleWaitStop();
             }
+#endif
 
             return result;
         }

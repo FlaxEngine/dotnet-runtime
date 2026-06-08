@@ -9,7 +9,13 @@ set(PRERELEASE 0)
 #     - for non-windows build platform & architecture is detected using inbuilt CMAKE variables and cross target component configure
 #     - for windows we use the passed in parameter to CMAKE to determine build arch
 #----------------------------------------
-set(CLR_CMAKE_HOST_OS ${CMAKE_SYSTEM_NAME})
+if (NOT DEFINED CLR_CMAKE_HOST_OS OR CLR_CMAKE_HOST_OS STREQUAL "" )
+  set(CLR_CMAKE_HOST_OS ${CMAKE_SYSTEM_NAME})
+  set(CLR_CMAKE_HOST_ARCH ${CMAKE_HOST_SYSTEM_PROCESSOR})
+  if (CLR_CMAKE_HOST_ARCH STREQUAL AMD64)
+    set(CLR_CMAKE_HOST_ARCH "x64")
+  endif()
+endif()
 string(TOLOWER ${CLR_CMAKE_HOST_OS} CLR_CMAKE_HOST_OS)
 if(CLR_CMAKE_HOST_OS STREQUAL linux)
     set(CLR_CMAKE_HOST_UNIX 1)
@@ -181,6 +187,24 @@ if(CLR_CMAKE_HOST_OS STREQUAL openbsd)
     set(CLR_CMAKE_HOST_OPENBSD 1)
 endif(CLR_CMAKE_HOST_OS STREQUAL openbsd)
 
+if(CLR_CMAKE_HOST_OS STREQUAL ps4)
+    set(CLR_CMAKE_HOST_UNIX 1)
+    set(CLR_CMAKE_HOST_UNIX_AMD64 1)
+    set(CLR_CMAKE_HOST_PS4 1)
+endif(CLR_CMAKE_HOST_OS STREQUAL ps4)
+
+if(CLR_CMAKE_HOST_OS STREQUAL ps5)
+    set(CLR_CMAKE_HOST_UNIX 1)
+    set(CLR_CMAKE_HOST_UNIX_AMD64 1)
+    set(CLR_CMAKE_HOST_PS5 1)
+endif(CLR_CMAKE_HOST_OS STREQUAL ps5)
+
+if(CLR_CMAKE_HOST_OS STREQUAL switch)
+    set(CLR_CMAKE_HOST_UNIX 1)
+    set(CLR_CMAKE_HOST_UNIX_ARM64 1)
+    set(CLR_CMAKE_HOST_SWITCH 1)
+endif(CLR_CMAKE_HOST_OS STREQUAL switch)
+
 if(CLR_CMAKE_HOST_OS STREQUAL netbsd)
     set(CLR_CMAKE_HOST_UNIX 1)
     set(CLR_CMAKE_HOST_UNIX_AMD64 1)
@@ -231,6 +255,10 @@ endif(CLR_CMAKE_HOST_OS STREQUAL emscripten)
 if(CLR_CMAKE_TARGET_OS STREQUAL wasi)
     set(CLR_CMAKE_HOST_WASI 1)
 endif(CLR_CMAKE_TARGET_OS STREQUAL wasi)
+
+message("[configureplatform.cmake]: CLR_CMAKE_TARGET_OS: '${CLR_CMAKE_TARGET_OS}'")
+message("[configureplatform.cmake]: CLR_CMAKE_HOST_OS: '${CLR_CMAKE_HOST_OS}'")
+message("[configureplatform.cmake]: CLR_CMAKE_HOST_ARCH: '${CLR_CMAKE_HOST_ARCH}'")
 
 #--------------------------------------------
 # This repo builds two set of binaries
@@ -419,6 +447,21 @@ if(CLR_CMAKE_TARGET_OS STREQUAL netbsd)
     set(CLR_CMAKE_TARGET_NETBSD 1)
 endif(CLR_CMAKE_TARGET_OS STREQUAL netbsd)
 
+if(CLR_CMAKE_TARGET_OS STREQUAL ps4)
+    set(CLR_CMAKE_TARGET_UNIX 1)
+    set(CLR_CMAKE_TARGET_PS4 1)
+endif(CLR_CMAKE_TARGET_OS STREQUAL ps4)
+
+if(CLR_CMAKE_TARGET_OS STREQUAL ps5)
+    set(CLR_CMAKE_TARGET_UNIX 1)
+    set(CLR_CMAKE_TARGET_PS5 1)
+endif(CLR_CMAKE_TARGET_OS STREQUAL ps5)
+
+if(CLR_CMAKE_TARGET_OS STREQUAL switch)
+    set(CLR_CMAKE_TARGET_UNIX 1)
+    set(CLR_CMAKE_TARGET_SWITCH 1)
+endif(CLR_CMAKE_TARGET_OS STREQUAL switch)
+
 if(CLR_CMAKE_TARGET_OS STREQUAL sunos)
     set(CLR_CMAKE_TARGET_UNIX 1)
     if(CLR_CMAKE_HOST_OS_ILLUMOS)
@@ -515,7 +558,7 @@ if(LOWERCASE_CMAKE_BUILD_TYPE STREQUAL debug)
     string(REPLACE "-D_FORTIFY_SOURCE=2 " "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
-if (CLR_CMAKE_TARGET_ANDROID OR CLR_CMAKE_TARGET_MACCATALYST OR CLR_CMAKE_TARGET_IOS OR CLR_CMAKE_TARGET_TVOS OR CLR_CMAKE_HOST_ARCH_ARMV6)
+if (CLR_CMAKE_TARGET_ANDROID OR CLR_CMAKE_TARGET_MACCATALYST OR CLR_CMAKE_TARGET_IOS OR CLR_CMAKE_TARGET_TVOS OR CLR_CMAKE_HOST_ARCH_ARMV6 OR CLR_CMAKE_HOST_SWITCH)
     # Some platforms are opted-out from using the in-tree zlib-ng by default:
     # - Android and iOS-like platforms: concerns about extra binary size
     # - Armv6: zlib-ng has build breaks

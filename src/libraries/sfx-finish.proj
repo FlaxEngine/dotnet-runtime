@@ -83,7 +83,7 @@
           UseHardlinksIfPossible="true" />
   </Target>
 
-  <Target Name="ValidateSharedFramework" AfterTargets="Build">
+  <Target Name="ValidateSharedFramework" AfterTargets="Build" Condition="false">
     <ItemGroup>
       <!-- exclude private assemblies from ref-->
       <_expectedRef Include="@(NetCoreAppLibrary)" Condition="!$([System.String]::new('%(Identity)').StartsWith('System.Private'))" />

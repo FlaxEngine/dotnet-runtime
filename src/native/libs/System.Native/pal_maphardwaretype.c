@@ -4,8 +4,24 @@
 #include "pal_config.h"
 #include "pal_maphardwaretype.h"
 
+#if (defined(TARGET_PS4) && TARGET_PS4) || (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_SWITCH) && TARGET_SWITCH)
+
+/* Not implemented */
+
+uint16_t MapHardwareType(uint16_t nativeType)
+{
+    return NetworkInterfaceType_Unknown;
+}
+
+#else
+
 #include <sys/socket.h>
 #include <sys/types.h>
+
+#if !defined(AF_PACKET) && HAVE_NETPACKET_PACKET_H
+// Fix for Android build
+#define AF_PACKET
+#endif
 
 #if defined(AF_PACKET)
 #if HAVE_NETPACKET_PACKET_H
@@ -117,3 +133,5 @@ uint16_t MapHardwareType(uint16_t nativeType)
     return NetworkInterfaceType_Unknown;
 #endif
 }
+
+#endif

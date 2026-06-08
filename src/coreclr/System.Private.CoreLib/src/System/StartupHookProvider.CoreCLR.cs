@@ -14,8 +14,10 @@ namespace System
     {
         private static unsafe void ManagedStartup(char* pDiagnosticStartupHooks)
         {
+#if FEATURE_PERFTRACING
             if (IsSupported)
                 ProcessStartupHooks(new string(pDiagnosticStartupHooks));
+#endif
         }
     }
 }

@@ -50,8 +50,10 @@ namespace System.Threading
                 throw new OutOfMemoryException();
             }
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
                 NativeRuntimeEventSource.Log.ThreadPoolIOEnqueue(this);
+#endif
         }
 
 #pragma warning disable IDE0060 // Remove unused parameter
@@ -95,8 +97,10 @@ namespace System.Threading
                 }
             }
 
+#if FEATURE_PERFTRACING
             if (NativeRuntimeEventSource.Log.IsEnabled())
                 NativeRuntimeEventSource.Log.ThreadPoolIODequeue(this);
+#endif
 
             _ThreadPoolWaitOrTimerCallback.PerformWaitOrTimerCallback(_callbackHelper!, timedOut);
         }

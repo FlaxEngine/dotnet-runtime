@@ -196,7 +196,7 @@ else ()
         install (FILES $<TARGET_PDB_FILE:System.IO.Compression.Native> DESTINATION .)
     endif ()
 
-    if(STATIC_LIBS_ONLY)
+    if(STATIC_LIBS_ONLY AND NOT _GAMING_XBOX)
         install_static_library(System.IO.Compression.Native.Aot aotsdk nativeaot)
         foreach(BROTLI_LIB ${BROTLI_LIBRARIES})
             # Brotli's build scripts can add some system dependencies like libm

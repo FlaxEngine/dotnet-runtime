@@ -23,6 +23,12 @@
 
 #if defined(TARGET_PS3)
 #define CONFIG_OS "CellOS"
+#elif defined (TARGET_PS4)
+#define CONFIG_OS "ps4"
+#elif defined (TARGET_PS5)
+#define CONFIG_OS "ps5"
+#elif defined (TARGET_SWITCH)
+#define CONFIG_OS "switch"
 #elif defined(__linux__)
 #define CONFIG_OS "linux"
 #elif defined(__APPLE__)

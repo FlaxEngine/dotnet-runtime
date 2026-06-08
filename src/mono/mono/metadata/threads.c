@@ -678,6 +678,8 @@ mono_thread_internal_set_priority (MonoInternalThread *internal, MonoThreadPrior
 #elif HOST_WASI
 	// Thread scheduling isn't yet implemented in the WASI build
 	return;
+#elif __SWITCH__
+	return;
 #else /* !HOST_WIN32 and not HOST_FUCHSIA */
 	pthread_t tid;
 	int policy = SCHED_OTHER;
@@ -724,7 +726,9 @@ mono_thread_internal_set_priority (MonoInternalThread *internal, MonoThreadPrior
 	{
 		switch (policy) {
 		case SCHED_FIFO:
+#ifdef SCHED_RR
 		case SCHED_RR:
+#endif
 			param.sched_priority = 50;
 			break;
 #ifdef SCHED_BATCH
@@ -3884,7 +3888,7 @@ mono_set_pending_exception_handle (MonoExceptionHandle exc)
 void
 mono_thread_init_apartment_state (void)
 {
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 	MonoInternalThread* thread = mono_thread_internal_current ();
 
 	/* Positive return value indicates success, either
@@ -3904,7 +3908,7 @@ mono_thread_init_apartment_state (void)
 void
 mono_thread_cleanup_apartment_state (void)
 {
-#ifdef HOST_WIN32
+#if defined(HOST_WIN32) && !_GAMING_XBOX
 	MonoInternalThread* thread = mono_thread_internal_current ();
 	if (thread && thread->apartment_state != ThreadApartmentState_Unknown) {
 		CoUninitialize ();

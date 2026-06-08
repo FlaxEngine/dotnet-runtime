@@ -62,11 +62,19 @@ main (int _argc, char* _argv[])
 	gchar** argv;
 	int i;
 
+#if _GAMING_XBOX
+	argc = 0;
+	argvw = NULL;
+	i = 0;
+	argv = g_new0 (gchar*, 1);
+	argv[0] = NULL;
+#else
 	argvw = CommandLineToArgvW (GetCommandLineW (), &argc);
 	argv = g_new0 (gchar*, argc + 1);
 	for (i = 0; i < argc; i++)
 		argv [i] = g_utf16_to_utf8 (argvw [i], -1, NULL, NULL, NULL);
 	argv [argc] = NULL;
+#endif
 
 	LocalFree (argvw);
 

@@ -3,9 +3,11 @@
     <PackageDescription>Provides the .NET app bootstrapper intended for use in the application directory</PackageDescription>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetOS)' != 'ps4' and '$(TargetOS)' != 'ps5' and '$(TargetOS)' != 'switch'">
     <NativeBinary Include="$(DotNetHostBinDir)/apphost$(ExeSuffix)" />
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)nethost$(LibSuffix)" />
+  </ItemGroup>
+  <ItemGroup>
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)nethost$(StaticLibSuffix)" />
     <NativeBinary Include="$(DotNetHostBinDir)/coreclr_delegates.h" />
     <NativeBinary Include="$(DotNetHostBinDir)/hostfxr.h" />
@@ -36,7 +38,7 @@
     <NativeBinary Include="$(DotNetHostBinDir)/$(LibPrefix)hostfxr$(StaticLibSuffix)" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(PackageTargetRuntime)' != ''">
+  <ItemGroup Condition="'$(PackageTargetRuntime)' != '' and '$(TargetOS)' != 'PS4' and '$(TargetOS)' != 'PS5' and '$(TargetOS)' != 'Switch'">
     <File Include="@(NativeBinary);@(_SymbolsToIncludeAlways)">
       <TargetPath>runtimes/$(PackageTargetRuntime)/native</TargetPath>
       <IsNative>true</IsNative>

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace System.Diagnostics.Tracing
 {
+#if FEATURE_ETW
     internal sealed class EventPipeEventProvider : EventProviderImpl
     {
         private readonly WeakReference<EventProvider> _eventProvider;
@@ -149,4 +150,5 @@ namespace System.Diagnostics.Tracing
             return EventPipeInternal.EventActivityIdControl((uint)controlCode, ref activityId);
         }
     }
+#endif
 }

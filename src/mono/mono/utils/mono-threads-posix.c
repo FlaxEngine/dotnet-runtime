@@ -30,11 +30,14 @@
 #include <mono/utils/mono-threads-debug.h>
 #include <mono/utils/mono-errno.h>
 
-#if defined (HAVE_PTHREAD_SETNAME_NP) || defined(__HAIKU__)
+#if defined (HAVE_PTHREAD_SETNAME_NP) || defined(__HAIKU__) || defined (__SWITCH__)
 #include <minipal/thread.h>
 #endif
 
 #include <errno.h>
+
+#if defined(__ORBIS__) || defined(__PROSPERO__)
+#else
 
 #if defined(_POSIX_VERSION) && !defined (HOST_WASM)
 
@@ -149,6 +152,9 @@ mono_thread_info_get_system_max_stack_size (void)
 int
 mono_thread_info_get_system_max_stack_size (void)
 {
+#ifdef TARGET_SWITCH
+	return INT_MAX;
+#else
 	struct rlimit lim;
 
 	/* If getrlimit fails, we don't enforce any limits. */
@@ -158,6 +164,7 @@ mono_thread_info_get_system_max_stack_size (void)
 	if (lim.rlim_max > (rlim_t)INT_MAX)
 		return INT_MAX;
 	return (int)lim.rlim_max;
+#endif
 }
 #endif
 
@@ -259,7 +266,7 @@ mono_native_thread_get_name (MonoNativeThreadId tid, char *name_out, size_t max_
 void
 mono_native_thread_set_name (MonoNativeThreadId tid, const char *name)
 {
-#if defined (HAVE_PTHREAD_SETNAME_NP) || defined(__HAIKU__)
+#if defined (HAVE_PTHREAD_SETNAME_NP) || defined(__HAIKU__) || defined (__SWITCH__)
 	// Ignore requests to set the main thread name because
 	// it causes the value returned by Process.ProcessName to change.
 	MonoNativeThreadId main_thread_tid;
@@ -312,7 +319,7 @@ mono_memory_barrier_process_wide (void)
 
 #endif /* defined(_POSIX_VERSION) */
 
-#if defined(USE_POSIX_BACKEND)
+#if defined(USE_POSIX_BACKEND) && !defined(__SWITCH__)
 
 gboolean
 mono_threads_suspend_begin_async_suspend (MonoThreadInfo *info, gboolean interrupt_kernel)
@@ -387,3 +394,5 @@ mono_threads_suspend_init (void)
 }
 
 #endif /* defined(USE_POSIX_BACKEND) */
+
+#endif

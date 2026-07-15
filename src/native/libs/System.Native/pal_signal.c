@@ -22,7 +22,7 @@
 #pragma clang diagnostic ignored "-Wunused-but-set-variable"
 #endif
 
-#if (defined(TARGET_PS5) && TARGET_PS5)
+#if (defined(TARGET_PS5) && TARGET_PS5) || (defined(TARGET_PS4) && TARGET_PS4)
 
 void SystemNative_RegisterForSigChld(SigChldCallback callback)
 {

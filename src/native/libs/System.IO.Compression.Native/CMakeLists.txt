@@ -193,7 +193,7 @@ else ()
         )
 
         install (TARGETS System.IO.Compression.Native DESTINATION .)
-        install (FILES $<TARGET_PDB_FILE:System.IO.Compression.Native> DESTINATION .)
+        #install (FILES $<TARGET_PDB_FILE:System.IO.Compression.Native> DESTINATION .)
     endif ()
 
     if(STATIC_LIBS_ONLY AND NOT _GAMING_XBOX)

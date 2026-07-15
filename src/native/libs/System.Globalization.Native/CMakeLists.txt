@@ -184,7 +184,7 @@ if (GEN_SHARED_LIB)
         )
 
         install (TARGETS System.Globalization.Native DESTINATION .)
-        install (FILES $<TARGET_PDB_FILE:System.Globalization.Native> DESTINATION .)
+        #install (FILES $<TARGET_PDB_FILE:System.Globalization.Native> DESTINATION .)
     else()
         install_with_stripped_symbols (System.Globalization.Native PROGRAMS .)
     endif()
